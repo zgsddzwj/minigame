@@ -128,8 +128,10 @@ function tailEvents(limit) {
   return lines.slice(-Math.max(1, Math.min(200, limit))).map(line => { try { return JSON.parse(line); } catch { return { at: '', type: 'unparsed', raw: line }; } });
 }
 function listWorkspaceFiles() {
+  const machine = /^deliverables\/evidence-.*\.txt$|^evidence\/automated\//;
   const results = [];
   const push = relative => {
+    if (machine.test(relative)) return;
     const abs = path.join(flow.workspace, relative);
     const stat = fs.existsSync(abs) && fs.statSync(abs);
     if (stat?.isFile() && stat.size < 3_000_000 && LISTABLE.test(relative)) results.push({ path: relative, size: stat.size });
@@ -361,7 +363,7 @@ function page() {
 
 <div class="cols">
   <div class="card">
-    <b>产物浏览（deliverables / evidence）</b>
+    <b>产物浏览（deliverables / evidence）</b> <span class="small">仅人工审阅材料；Agent 自检证据与自动检查日志已隐藏（仍计入审批指纹）</span>
     <div id="files" style="margin-top:8px"></div>
   </div>
   <div class="card">

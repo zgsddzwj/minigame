@@ -274,6 +274,24 @@ function page() {
   .filebtn:hover { color: var(--text); border-color: var(--blue); }
   pre.viewer { background: #0a0e18; border: 1px solid var(--line); border-radius: 8px; padding: 12px; max-height: 420px; overflow: auto; white-space: pre-wrap; word-break: break-all; font: 12px/1.6 Consolas, monospace; }
   .viewer img { max-width: 100%; border-radius: 8px; }
+  .viewer.md { font: 14px/1.8 "Segoe UI", "Microsoft YaHei", sans-serif; white-space: normal; word-break: normal; }
+  .viewer.md h1, .viewer.md h2, .viewer.md h3, .viewer.md h4 { margin: 16px 0 8px; line-height: 1.4; }
+  .viewer.md h1 { font-size: 19px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+  .viewer.md h2 { font-size: 17px; }
+  .viewer.md h3 { font-size: 15px; }
+  .viewer.md h4 { font-size: 14px; color: var(--dim); }
+  .viewer.md p { margin: 8px 0; }
+  .viewer.md ul, .viewer.md ol { margin: 8px 0 8px 22px; }
+  .viewer.md li { margin: 3px 0; }
+  .viewer.md table { border-collapse: collapse; margin: 10px 0; width: 100%; font-size: 13px; }
+  .viewer.md th, .viewer.md td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
+  .viewer.md th { background: #101624; }
+  .viewer.md tr:nth-child(even) td { background: #141a28; }
+  .viewer.md code { background: #0a0e18; border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; font: 12px Consolas, monospace; color: #9fc4f0; }
+  .viewer.md blockquote { border-left: 3px solid var(--amber); margin: 8px 0; padding: 4px 12px; color: var(--dim); background: #141a28; }
+  .viewer.md .mdcode { background: #0a0e18; border: 1px solid var(--line); border-radius: 6px; padding: 10px; overflow-x: auto; font: 12px/1.6 Consolas, monospace; white-space: pre; }
+  .viewer.md hr { border: none; border-top: 1px solid var(--line); margin: 14px 0; }
+  .viewer.md a { color: var(--blue); }
   label.tgl { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; color: var(--dim); font-size: 13px; }
   .small { font-size: 12px; color: var(--dim); }
   .ok { color: var(--green); } .bad2 { color: var(--red); }
@@ -456,12 +474,70 @@ function loadFiles() {
     });
   }).catch(function () { });
 }
+function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function inlineMd(s) {
+  return s
+    .replace(/\`([^\`]+)\`/g, function (m, c) { return '<code>' + c + '</code>'; })
+    .replace(/\\*\\*([^*]+)\\*\\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*])\\*([^*\\n]+)\\*/g, '$1<em>$2</em>')
+    .replace(/\\[([^\\]]+)\\]\\((https?:[^)\\s]+)\\)/g, function (m, t, u) { return '<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + t + '</a>'; });
+}
+function renderMarkdown(src) {
+  var lines = escHtml(src).split(/\\r?\\n/);
+  var html = [], i = 0, para = [];
+  function flushPara() { if (para.length) { html.push('<p>' + para.map(inlineMd).join('<br>') + '</p>'); para = []; } }
+  while (i < lines.length) {
+    var line = lines[i];
+    if (/^\\s*\\\`\\\`\\\`/.test(line)) {
+      flushPara(); var buf = []; i++;
+      while (i < lines.length && !/^\\s*\\\`\\\`\\\`/.test(lines[i])) { buf.push(lines[i]); i++; }
+      i++;
+      html.push('<pre class="mdcode"><code>' + buf.join('\\n') + '</code></pre>');
+      continue;
+    }
+    var h = line.match(/^(#{1,6})\\s+(.*)$/);
+    if (h) { flushPara(); html.push('<h' + h[1].length + '>' + inlineMd(h[2]) + '</h' + h[1].length + '>'); i++; continue; }
+    if (/^\\s*(-{3,}|\\*{3,})\\s*$/.test(line)) { flushPara(); html.push('<hr>'); i++; continue; }
+    if (/^\\s*\\|.*\\|?\\s*$/.test(line) && line.indexOf('|') >= 0 && i + 1 < lines.length && /^\\s*\\|?[\\s:|-]+\\|?\\s*$/.test(lines[i + 1]) && lines[i + 1].indexOf('-') >= 0) {
+      flushPara();
+      var cells = function (row) { return row.trim().replace(/^\\||\\|$/g, '').split('|').map(function (c) { return inlineMd(c.trim()); }); };
+      var head = cells(lines[i]); i += 2;
+      var rows = [];
+      while (i < lines.length && /^\\s*\\|.*\\|?\\s*$/.test(lines[i]) && lines[i].trim()) { rows.push(cells(lines[i])); i++; }
+      html.push('<table><thead><tr>' + head.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>'
+        + rows.map(function (r3) { return '<tr>' + r3.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>');
+      continue;
+    }
+    if (/^\\s*&gt;\\s?/.test(line)) {
+      flushPara(); var q = [];
+      while (i < lines.length && /^\\s*&gt;\\s?/.test(lines[i])) { q.push(lines[i].replace(/^\\s*&gt;\\s?/, '')); i++; }
+      html.push('<blockquote>' + q.map(inlineMd).join('<br>') + '</blockquote>');
+      continue;
+    }
+    var li = line.match(/^\\s*(?:[-*+]|\\d+[.)])\\s+(.*)$/);
+    if (li) {
+      flushPara(); var tag = /^\\s*\\d+[.)]/.test(line) ? 'ol' : 'ul'; var items = [];
+      while (i < lines.length) {
+        var m2 = lines[i].match(/^\\s*(?:[-*+]|\\d+[.)])\\s+(.*)$/);
+        if (!m2) break;
+        items.push(m2[1]); i++;
+      }
+      html.push('<' + tag + '>' + items.map(function (t) { return '<li>' + inlineMd(t) + '</li>'; }).join('') + '</' + tag + '>');
+      continue;
+    }
+    if (!line.trim()) { flushPara(); i++; continue; }
+    para.push(line.trim()); i++;
+  }
+  flushPara();
+  return html.join('\\n');
+}
 function openFile(p) {
   fetch('/api/workspace-file?path=' + encodeURIComponent(p)).then(function (r) { return r.text().then(function (t) { return { ok: r.ok, ct: r.headers.get('content-type') || '', t: t }; }); }).then(function (r) {
     $('viewerCard').style.display = ''; $('viewerPath').textContent = p;
-    var v = $('viewer'); v.textContent = '';
+    var v = $('viewer'); v.className = 'viewer'; v.textContent = '';
     if (r.ct.indexOf('image/png') === 0) { var img = document.createElement('img'); img.src = '/api/workspace-file?path=' + encodeURIComponent(p); v.appendChild(img); }
-    else v.textContent = r.t;
+    else if (/\\.md$/i.test(p)) { v.className = 'viewer md'; v.innerHTML = renderMarkdown(r.t); }
+    else { v.textContent = r.t; }
     $('viewerCard').scrollIntoView({ behavior: 'smooth' });
   });
 }

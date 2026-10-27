@@ -113,7 +113,10 @@ function listRuns() {
   return fs.readdirSync(runsDir).filter(name => /^[0-9-]+$/.test(name)).sort().reverse().slice(0, 20).map(runId => ({
     runId,
     attempts: fs.readdirSync(path.join(runsDir, runId)).filter(name => /^[a-z0-9-]+$/.test(name)).sort().map(dir => {
-      const files = fs.readdirSync(path.join(runsDir, runId, dir)).filter(name => /\.(log|txt|json|jsonl)$/.test(name));
+      const files = fs.readdirSync(path.join(runsDir, runId, dir)).filter(name => /\.(log|txt|json|jsonl)$/.test(name)).map(name => {
+        let mtime = 0; try { mtime = fs.statSync(path.join(runsDir, runId, dir, name)).mtimeMs; } catch { }
+        return { name, mtime };
+      });
       return { dir, files };
     }),
   }));
@@ -265,6 +268,8 @@ function page() {
   @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
   .feed { max-height: 260px; overflow-y: auto; font: 12px/1.7 Consolas, monospace; color: var(--dim); }
   .feed b { color: var(--text); font-weight: 600; }
+  .feed .evt-bad { color: var(--red); }
+  .feed .evt-ok { color: var(--green); }
   .filebtn { display: inline-block; font-size: 12px; padding: 2px 8px; margin: 2px 4px 2px 0; border-radius: 5px; border: 1px solid var(--line); background: #101624; color: var(--dim); cursor: pointer; }
   .filebtn:hover { color: var(--text); border-color: var(--blue); }
   pre.viewer { background: #0a0e18; border: 1px solid var(--line); border-radius: 8px; padding: 12px; max-height: 420px; overflow: auto; white-space: pre-wrap; word-break: break-all; font: 12px/1.6 Consolas, monospace; }
@@ -284,6 +289,7 @@ function page() {
   <div class="row"><b>总进度</b><span id="pctText" class="small"></span></div>
   <div class="bar"><div id="bar" style="width:0%"></div></div>
   <div class="stepper" id="stepper"></div>
+  <div class="small" style="margin-top:8px">判定标准：状态变 <b>waiting_human</b>（🚩 有门禁等你）或 <b>complete</b> 即成功，同时事件区出现 ✓ stage_verified；状态 <b>failed</b> / <b>blocked</b> 即未通过，原因看下方"失败 / 反馈详情"和红色事件行。</div>
 </div>
 
 <div class="card" id="msgCard"><div id="msg" class="msg"></div><div id="orphan" class="small bad2"></div></div>
@@ -330,7 +336,7 @@ function page() {
     <details><summary>失败 / 反馈详情</summary><div id="feedback" class="msg small"></div></details>
   </div>
   <div class="card">
-    <b>实时事件</b>
+    <b>实时事件</b> <span class="small">完整历史 · 最新在最上 · ✗/⛔=失败 ✅=验证通过</span>
     <div class="feed" id="events"></div>
   </div>
 </div>
@@ -346,7 +352,9 @@ function page() {
       <select id="runSel"><option value="">选择运行…</option></select>
       <select id="attSel"><option value="">阶段尝试…</option></select>
       <select id="logSel"><option value="">日志文件…</option></select>
+      <label class="tgl"><input type="checkbox" id="followTgl"> 跟随最新（阶段运行时自动尾随当前日志）</label>
     </div>
+    <div class="small" style="margin-bottom:6px">看"Agent 实际在做什么"选 <b>*.events.jsonl</b>（Codex 事件流：读文件/写产物/思考）；<b>*.stderr.log</b> 是进程错误；<b>*.prompt.txt</b> 是发给它的完整任务书。</div>
     <pre class="viewer" id="logView">选择运行与日志文件后在此查看</pre>
   </div>
 </div>
@@ -362,17 +370,26 @@ function page() {
 </div>
 
 <script>
-var S = null, autoTimer = null, autoMode = false;
+var S = null, autoTimer = null, autoMode = false, followTimer = null;
 function $(id) { return document.getElementById(id); }
 function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 function api(path, opts) { return fetch(path, opts).then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || r.status); return j; }); }); }
 function showErr(m) { $('err').textContent = m || ''; }
+function fmtTime(iso) {
+  if (!iso) return '';
+  var d = new Date(iso); if (isNaN(d.getTime())) return String(iso);
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  return (d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+}
+var EVT_ICON = { stage_started: '▶', stage_failed: '✗', stage_verified: '✓', blocked: '⛔', invalidated: '↩', human_approved: '★', interrupted: '⚡', paused_budget: '⏸', device_evidence_recorded: '📎', initialized: '●', stage_retry: '↻' };
+function isBadEvt(t) { return t === 'stage_failed' || t === 'blocked' || t === 'interrupted'; }
+function isGoodEvt(t) { return t === 'stage_verified' || t === 'human_approved'; }
 
 function render() {
   api('/api/state').then(function (st) {
     S = st; $('err').textContent = '';
     var chip = $('chip'); chip.textContent = st.status; chip.className = 'chip ' + st.status;
-    $('meta').textContent = st.mode ? ('模式 ' + st.mode + ' · Agent 调用 ' + st.totalAgentCalls + ' 次 · 更新于 ' + (st.updatedAt || '').replace('T', ' ').slice(0, 19)) : '';
+    $('meta').textContent = st.mode ? ('模式 ' + st.mode + ' · Agent 调用 ' + st.totalAgentCalls + ' 次 · 更新于 ' + fmtTime(st.updatedAt)) : '';
     var done = st.stages.filter(function (s) { return s.status === 'complete'; }).length;
     var pct = Math.round(done / st.stages.length * 100);
     $('bar').style.width = pct + '%';
@@ -418,9 +435,8 @@ function loadEvents() {
   api('/api/events?limit=30').then(function (list) {
     var box = $('events'); box.textContent = '';
     list.slice().reverse().forEach(function (ev) {
-      var d = el('div');
-      var b = el('b', null, (ev.at || '').replace('T', ' ').slice(5, 19) + '  ' + ev.type);
-      d.appendChild(b);
+      var d = el('div', isBadEvt(ev.type) ? 'evt-bad' : isGoodEvt(ev.type) ? 'evt-ok' : '');
+      d.appendChild(el('b', null, (EVT_ICON[ev.type] || '·') + ' ' + fmtTime(ev.at) + '  ' + ev.type));
       if (ev.stage) d.appendChild(document.createTextNode('  ' + ev.stage + (ev.attempt ? ' 第' + ev.attempt + '次' : '')));
       if (ev.error) d.appendChild(document.createTextNode('  ' + ev.error));
       else if (ev.message && ev.type !== 'initialized') d.appendChild(document.createTextNode('  ' + ev.message));
@@ -473,13 +489,27 @@ function fillLogs(r) {
   log.textContent = ''; log.appendChild(el('option', null, '日志文件…'));
   var a = r && r.attempts.find(function (x) { return x.dir === dir; });
   if (!a) return;
-  a.files.forEach(function (f) { var o = el('option', null, f); o.value = f; log.appendChild(o); });
+  a.files.forEach(function (f) { var o = el('option', null, f.name); o.value = f.name; log.appendChild(o); });
   log.onchange = function () {
     var f = log.value; if (!f) return;
     fetch('/api/runlog?run=' + encodeURIComponent(runId) + '&attempt=' + encodeURIComponent(dir) + '&file=' + encodeURIComponent(f))
       .then(function (r2) { return r2.text(); })
       .then(function (t) { $('logView').textContent = t || '（空）'; });
   };
+}
+function followTick() {
+  if (!$('followTgl') || !$('followTgl').checked) return;
+  api('/api/runs').then(function (runs) {
+    if (!runs.length) { $('logView').textContent = '还没有任何运行记录'; return; }
+    var r = runs[0];
+    var a = r.attempts[r.attempts.length - 1];
+    if (!a || !a.files.length) return;
+    var best = a.files.slice().sort(function (x, y) { return y.mtime - x.mtime; })[0];
+    $('runSel').value = r.runId; fillAttempts(runs); $('attSel').value = a.dir; fillLogs(r); $('logSel').value = best.name;
+    fetch('/api/runlog?run=' + encodeURIComponent(r.runId) + '&attempt=' + encodeURIComponent(a.dir) + '&file=' + encodeURIComponent(best.name))
+      .then(function (r2) { return r2.text(); })
+      .then(function (t) { var v = $('logView'); v.textContent = t || '（空）'; v.scrollTop = v.scrollHeight; });
+  }).catch(function () { });
 }
 function act(body) {
   showErr('');
@@ -533,6 +563,7 @@ setInterval(render, 2500);
 setInterval(loadEvents, 5000);
 setInterval(loadFiles, 15000);
 setInterval(loadRuns, 20000);
+setInterval(followTick, 4000);
 </script>
 </body>
 </html>`;

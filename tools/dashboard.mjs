@@ -210,14 +210,14 @@ function shutdown() {
     const active = path.join(flow.runtime, 'active-worker.json');
     try {
       const worker = readJson(active);
-      if (process.platform === 'win32') execute('taskkill.exe', ['/PID', String(worker.pid), '/T', '/F'], { timeoutMs: 8000 }).catch(() => { });
-      writeForced(active, worker);
+      if (worker?.pid && process.platform === 'win32') {
+        execute('taskkill.exe', ['/PID', String(worker.pid), '/T', '/F'], { timeoutMs: 8000 }).catch(() => { });
+        setTimeout(() => process.exit(0), 1000);
+        return;
+      }
     } catch { }
   }
   process.exit(0);
-}
-function writeForced(active, worker) {
-  try { fs.writeFileSync(active, JSON.stringify({ ...worker, forced: true })); } catch { }
 }
 function page() {
   return `<!doctype html>

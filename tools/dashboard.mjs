@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import http from 'node:http';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Workflow, readJson, execute } from './core.mjs';
@@ -107,6 +108,34 @@ async function handleAction(body) {
     default: throw new Error(`未知操作：${action}`);
   }
 }
+function liveTail() {
+  let worker;
+  try { worker = readJson(path.join(flow.runtime, 'active-worker.json')); } catch { return null; }
+  if (!worker?.at) return null;
+  const dir = path.join(os.homedir(), '.zcode', 'cli', 'rollout');
+  if (!fs.existsSync(dir)) return null;
+  const since = new Date(worker.at).getTime() - 5000;
+  const files = fs.readdirSync(dir).filter(name => name.startsWith('model-io-sess_')).map(name => {
+    let st; try { st = fs.statSync(path.join(dir, name)); } catch { return null; }
+    return { name, path: path.join(dir, name), mtime: st.mtimeMs, birth: st.birthtimeMs };
+  }).filter(f => f && f.birth >= since).sort((a, b) => b.mtime - a.mtime);
+  if (!files.length) return null;
+  const f = files[0];
+  let lines = [];
+  try { lines = fs.readFileSync(f.path, 'utf8').trim().split('\n'); } catch { return null; }
+  const tail = [];
+  const start = Math.max(0, lines.length - 20);
+  for (let i = start; i < lines.length; i++) {
+    try {
+      const j = JSON.parse(lines[i]);
+      const msgs = j.request?.messages || [];
+      const tools = msgs.filter(m => m.role === 'tool');
+      const snippet = tools.length ? String(JSON.stringify(tools[tools.length - 1].content)).replace(/\s+/g, ' ').slice(0, 150) : '(任务开始)';
+      tail.push({ round: i + 1, snippet });
+    } catch { }
+  }
+  return { file: path.basename(f.path), total: lines.length, tail };
+}
 function listRuns() {
   const runsDir = path.join(flow.runtime, 'runs');
   if (!fs.existsSync(runsDir)) return [];
@@ -183,6 +212,7 @@ async function route(req, res) {
   }
   if (req.method === 'GET' && url.pathname === '/api/state') return send(200, publicState());
   if (req.method === 'GET' && url.pathname === '/api/events') return send(200, tailEvents(Number(url.searchParams.get('limit') || 40)));
+  if (req.method === 'GET' && url.pathname === '/api/live-tail') return send(200, liveTail());
   if (req.method === 'GET' && url.pathname === '/api/runs') return send(200, listRuns());
   if (req.method === 'GET' && url.pathname === '/api/workspace-files') return send(200, listWorkspaceFiles());
   if (req.method === 'GET' && url.pathname === '/api/workspace-file') return serveWorkspaceFile(res, url.searchParams.get('path') || '');
@@ -368,6 +398,7 @@ function page() {
   </div>
   <div class="card">
     <b>运行日志</b>
+    <div class="feed" id="liveTail" style="display:none; max-height:220px; margin-bottom:8px"></div>
     <div class="row" style="margin:8px 0">
       <select id="runSel"><option value="">选择运行…</option></select>
       <select id="attSel"><option value="">阶段尝试…</option></select>
@@ -543,6 +574,22 @@ function openFile(p) {
     $('viewerCard').scrollIntoView({ behavior: 'smooth' });
   });
 }
+function loadLive() {
+  api('/api/live-tail').then(function (t) {
+    var box = $('liveTail');
+    if (!t || !t.tail || !t.tail.length) { box.style.display = 'none'; return; }
+    box.style.display = '';
+    box.textContent = '';
+    box.appendChild(el('b', null, '⚡ Agent 实时动作 · 第 ' + t.total + ' 轮（4 秒刷新）'));
+    t.tail.forEach(function (r4) {
+      var d = el('div');
+      d.appendChild(el('b', null, '轮' + r4.round));
+      d.appendChild(document.createTextNode('  ' + r4.snippet));
+      box.appendChild(d);
+    });
+    box.scrollTop = box.scrollHeight;
+  }).catch(function () { });
+}
 function loadRuns() {
   api('/api/runs').then(function (runs) {
     var sel = $('runSel'); sel.textContent = '';
@@ -636,12 +683,13 @@ function autoLoop() {
   }, 4000);
 }
 $('autoTgl').onchange = function () { autoMode = $('autoTgl').checked; autoLoop(); };
-render(); loadEvents(); loadFiles(); loadRuns();
+render(); loadEvents(); loadFiles(); loadRuns(); loadLive();
 setInterval(render, 2500);
 setInterval(loadEvents, 5000);
 setInterval(loadFiles, 15000);
 setInterval(loadRuns, 20000);
 setInterval(followTick, 4000);
+setInterval(loadLive, 4000);
 </script>
 </body>
 </html>`;

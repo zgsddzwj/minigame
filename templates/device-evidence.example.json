@@ -1,0 +1,12 @@
+{
+  "result": "pass",
+  "buildVersion": "0.1.0",
+  "packageHash": "填写 H4 候选中冻结的真实 SHA256",
+  "tester": "填写实际测试人",
+  "devices": [
+    { "model": "填写真实 iPhone 型号", "os": "iOS 实际版本", "wechatVersion": "实际版本", "result": "pass", "coldStartMs": 0, "averageFps": 0 },
+    { "model": "填写真实 Android 型号", "os": "Android 实际版本", "wechatVersion": "实际版本", "result": "pass", "coldStartMs": 0, "averageFps": 0 }
+  ],
+  "attachments": ["evidence/device/android-log.txt", "evidence/device/ios-log.txt"],
+  "notes": "模板不是测试证据。必须替换全部占位值，填写实测数据并提供日志或录像。"
+}

@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "workspace": "game-workspace",
+  "agentRuntime": {
+    "kind": "volcengine-coding-plan",
+    "model": "glm-5.3-flash",
+    "modelProvider": "volcengine-coding-plan",
+    "baseUrl": "https://ark.cn-beijing.volces.com/api/coding/v3",
+    "apiKeyEnv": "ARK_API_KEY",
+    "inheritUserConfig": false,
+    "entrypoint": null,
+    "timeoutMinutes": 20
+  },
+  "limits": {
+    "maxAttemptsPerStage": 3,
+    "maxAgentCallsPerRun": 24,
+    "maxRunMinutes": 120,
+    "maxObservedTokensPerRun": 2000000,
+    "maxAutomaticRewindsPerRun": 2
+  },
+  "tools": {
+    "cocosExecutable": null,
+    "wechatCli": "C:/Program Files (x86)/Tencent/微信web开发者工具/cli.bat"
+  },
+  "policy": {
+    "externalServiceBudgetCny": 0,
+    "allowUpload": false,
+    "allowSubmitReview": false,
+    "allowPublish": false,
+    "allowPurchases": false
+  }
+}

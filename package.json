@@ -1,0 +1,15 @@
+{
+  "name": "wechat-minigame-agent-workflow",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "workflow": "node tools/workflow.mjs",
+    "doctor": "node tools/workflow.mjs doctor",
+    "setup:coding-plan": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup-coding-plan.ps1",
+    "demo": "node tools/demo.mjs",
+    "dashboard": "node tools/dashboard.mjs",
+    "test": "node --test tests"
+  }
+}

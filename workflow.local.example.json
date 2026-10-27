@@ -1,0 +1,13 @@
+{
+  "tools": {
+    "cocosExecutable": "D:/Cocos/Creator/3.8.REPLACE/CocosCreator.exe",
+    "wechatCli": "C:/Program Files (x86)/Tencent/微信web开发者工具/cli.bat"
+  },
+  "agentRuntime": {
+    "kind": "volcengine-coding-plan",
+    "model": "glm-5.3-flash",
+    "baseUrl": "https://ark.cn-beijing.volces.com/api/coding/v3",
+    "apiKeyEnv": "ARK_API_KEY",
+    "entrypoint": "C:/path/to/codex.exe"
+  }
+}

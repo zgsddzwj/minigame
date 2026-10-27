@@ -1,0 +1,24 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { Workflow, writeJson } from './core.mjs';
+import { copyFixture } from './simulation.mjs';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const base = new Workflow(root);
+const diagnosticRoot = path.join(root, '.workflow', `live-diagnostic-${Date.now()}`);
+copyFixture(root, diagnosticRoot);
+writeJson(path.join(diagnosticRoot, 'workflow.config.json'), base.config);
+fs.writeFileSync(path.join(diagnosticRoot, 'game-workspace/brief.md'), '# Live integration diagnostic\nVerify actual filesystem tools, structured handoff and independent review. This is not a game project.\n');
+const role = 'This is a bounded live diagnostic, not game development. Write deliverables/transport.json with exactly {"answer":56,"kind":"live-tool-check"}. Write deliverables/transport.md documenting the actual file write. Read and run game/scripts/verify.mjs; do not modify it. Return done with both files in artifacts and a passing check whose evidence is deliverables/transport.md. Do not access other projects, upload, or publish.';
+fs.writeFileSync(path.join(diagnosticRoot, 'agents/diagnostic.md'), role);
+fs.writeFileSync(path.join(diagnosticRoot, 'agents/producer.md'), 'Independently inspect the diagnostic JSON, Markdown, checker source and controller-generated check log supplied in this prompt. Confirm answer=56, kind=live-tool-check, checker assertions and the real logged exit code. Do not start another process; the controller has already executed the checker. Use read-only tools and return done with a check pointing to the provided log when evidence passes. This is a CLI integration test, not a game stage.');
+fs.mkdirSync(path.join(diagnosticRoot, 'game-workspace/game/scripts'), { recursive: true });
+fs.writeFileSync(path.join(diagnosticRoot, 'game-workspace/game/scripts/verify.mjs'), 'import fs from "node:fs"; import assert from "node:assert/strict"; const result=JSON.parse(fs.readFileSync("deliverables/transport.json","utf8")); assert.deepEqual(result,{answer:56,kind:"live-tool-check"}); console.log("Actual file handoff verified");\n');
+writeJson(path.join(diagnosticRoot, 'workflow/stages.json'), [{ id: '01-diagnostic', name: '真实子 Agent 写文件与主 Agent 独立审查', agent: 'diagnostic', requires: [], outputs: ['deliverables/transport.json', 'deliverables/transport.md'], checks: [['{node}', 'game/scripts/verify.mjs']], gate: null }]);
+const flow = new Workflow(diagnosticRoot);
+await flow.init();
+const state = await flow.run();
+writeJson(path.join(root, '.workflow/live-diagnostic-result.json'), { at: new Date().toISOString(), diagnosticRoot, status: state.status, calls: state.totalAgentCalls, message: state.message, gameValidated: false });
+console.log(JSON.stringify({ diagnosticRoot, status: state.status, calls: state.totalAgentCalls, gameValidated: false }, null, 2));
+if (state.status !== 'complete') process.exitCode = 1;

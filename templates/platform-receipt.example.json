@@ -1,0 +1,10 @@
+{
+  "status": "submitted",
+  "version": "0.1.0",
+  "manifestSha256": "填写 release plan 输出的清单 SHA256",
+  "operator": "填写实际操作人",
+  "platformRecordId": "填写后台审核单号或版本记录编号",
+  "at": "填写实际操作时间 ISO8601",
+  "note": "填写本次在微信后台完成的真实操作",
+  "evidence": ["evidence/platform/submission.png"]
+}

@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "status": { "type": "string", "enum": ["done", "revise", "blocked"] },
+    "summary": { "type": "string" },
+    "artifacts": { "type": "array", "items": { "type": "string" } },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "passed": { "type": "boolean" },
+          "evidence": { "type": "string" }
+        },
+        "required": ["name", "passed", "evidence"],
+        "additionalProperties": false
+      }
+    },
+    "blockers": { "type": "array", "items": { "type": "string" } },
+    "repairStage": { "type": ["string", "null"] }
+  },
+  "required": ["status", "summary", "artifacts", "checks", "blockers", "repairStage"],
+  "additionalProperties": false
+}

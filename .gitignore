@@ -1,0 +1,13 @@
+.workflow/
+.demo/
+node_modules/
+game-workspace/**/node_modules/
+game-workspace/**/library/
+game-workspace/**/temp/
+game-workspace/**/build/
+game-workspace/**/local/
+*.pem
+.env
+.env.*
+!.env.example
+workflow.local.json

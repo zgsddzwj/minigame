@@ -1,0 +1,61 @@
+[
+  {
+    "id": "01-concept", "name": "选题与玩法设计", "agent": "designer",
+    "requires": [],
+    "outputs": ["deliverables/01-concept.md", "deliverables/game-design.md"],
+    "checks": [],
+    "gate": { "id": "H1", "title": "确认玩法和范围", "instructions": "审阅 3 个候选与主 Agent 推荐，确认唯一首版方案、功能边界、资源预算。拒绝时填写改动意见。" }
+  },
+  {
+    "id": "02-architecture", "name": "方案与技术选型", "agent": "architect",
+    "requires": ["01-concept"],
+    "outputs": ["deliverables/02-architecture.md", "deliverables/backlog.json", "deliverables/toolchain.json"],
+    "checks": [], "gate": null
+  },
+  {
+    "id": "03-prototype", "name": "可玩灰盒原型", "agent": "prototype",
+    "requires": ["02-architecture"],
+    "outputs": ["deliverables/03-prototype.md", "deliverables/prototype-test.json", "game/package.json", "game/scripts/verify.mjs"],
+    "checks": [["{node}", "game/scripts/verify.mjs", "prototype"]],
+    "gate": { "id": "H2", "title": "试玩并确认核心乐趣", "instructions": "按产物中的入口试玩 3 局，确认操作反馈、输赢逻辑、节奏和是否愿意再玩一局。不好玩就返工原型，必要时退回选题。" }
+  },
+  {
+    "id": "04-art", "name": "UI 与美术定稿", "agent": "artist",
+    "requires": ["03-prototype"],
+    "outputs": ["deliverables/04-art.md", "deliverables/asset-manifest.json", "deliverables/ui-preview.png"],
+    "checks": [],
+    "gate": { "id": "H3", "title": "确认实际视觉样张", "instructions": "查看真实游戏画面和关键页面样张，确认一种视觉方向。确认后自动完成同风格资产和界面。" }
+  },
+  {
+    "id": "05-development", "name": "正式开发", "agent": "developer",
+    "requires": ["04-art"],
+    "outputs": ["deliverables/05-development.md", "deliverables/feature-matrix.json"],
+    "checks": [["{node}", "game/scripts/verify.mjs", "development"]], "gate": null
+  },
+  {
+    "id": "06-wechat", "name": "微信功能接入", "agent": "platform",
+    "requires": ["05-development"],
+    "outputs": ["deliverables/06-wechat.md", "deliverables/platform-matrix.json"],
+    "checks": [["{node}", "game/scripts/verify.mjs", "wechat"]], "gate": null
+  },
+  {
+    "id": "07-qa", "name": "测试、优化与真机验收", "agent": "qa",
+    "requires": ["06-wechat"],
+    "outputs": ["deliverables/07-qa.md", "deliverables/qa-results.json", "deliverables/device-test-plan.md"],
+    "checks": [["{node}", "game/scripts/verify.mjs", "release"]],
+    "gate": { "id": "H4", "title": "补齐真机证据并验收", "instructions": "在微信真机执行测试清单，提供设备/系统/微信版本、包版本、耗时、帧率、异常和日志或录像路径。不能用浏览器结果替代。先 evidence 导入记录，再批准。", "evidenceRequired": true }
+  },
+  {
+    "id": "08-release", "name": "生成发行候选与上架材料", "agent": "release",
+    "requires": ["07-qa"],
+    "outputs": ["deliverables/08-release.md", "deliverables/release-manifest.json", "deliverables/compliance-matrix.json", "deliverables/store-listing.md"],
+    "checks": [["{node}", "game/scripts/verify.mjs", "release"]],
+    "gate": { "id": "H5", "title": "确认发行候选和平台操作范围", "instructions": "审阅精确版本、包哈希、资质核验、隐私文案与回滚方案。确认只代表候选通过验收；上传、提审和正式发布各自需要真实操作授权，按发布手册执行。" }
+  },
+  {
+    "id": "09-operations", "name": "上线观察与迭代准备", "agent": "operations",
+    "requires": ["08-release"],
+    "outputs": ["deliverables/09-operations.md", "deliverables/metrics-plan.json", "deliverables/incident-runbook.md"],
+    "checks": [], "gate": null
+  }
+]

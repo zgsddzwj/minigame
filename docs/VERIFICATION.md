@@ -9,8 +9,8 @@
 | 迁移前的真实 CLI 结构化调用 | 历史验证通过 | 当时使用 OpenAI 模型，仅证明编排器机制；迁移后不再作为当前模型服务验证 |
 | 迁移前的真实 Agent 端到端小任务 | 历史验证通过 | 真实写文件 → 控制器执行断言 → 主 Agent 审查；迁移后需用 Coding Plan Key 重新冒烟 |
 | JavaScript 语法 | 通过 | 工具脚本经过 `node --check` |
-| 本地 Agent 外壳 | Codex CLI | 只负责文件、命令和结构化 Agent 循环；模型 provider 强制指向火山 Coding Plan |
-| 当前模型服务 | Coding Plan / glm-5.3-flash | 代码已完成严格配置；等待用户在环境变量提供已绑定套餐的 `ARK_API_KEY` 后做真实调用验证 |
+| 本地 Agent 外壳 | ZCode 本地 Harness（桌面版内置 CLI 0.16.5，无头 `--prompt` 模式） | 工作者 yolo、审查者 plan 只读；任务书经 `--attach` 注入；结果 JSON 由控制器解析并校验 |
+| 当前模型服务 | 火山引擎 Coding Plan / glm-5.3-flash（Anthropic 兼容协议） | 密钥经 `ARK_API_KEY` 环境变量注入，供应商名 `ark` 自动解析；真实调用已验证（见下方 2026-10-27 迁移记录） |
 | Node | 20.20.0 可运行控制器 | 正式生产工具链应在架构阶段锁定受支持版本 |
 | 微信开发者工具 | 找到 CLI 文件 | 尚未确认目标小游戏账号权限与实际构建 |
 | Cocos Creator | 路径未配置 | 未声称编辑器不存在；真实游戏构建尚未验证 |
@@ -19,6 +19,23 @@
 
 联调发现并处理的问题：npm 版 CLI 与全局推理参数不匹配，改用本机新版 CLI；命令行连接需要使用系统已有代理，写入项目局部配置；独立运行不继承桌面插件配置，明确复用本机已有 Windows 沙箱设置；检查日志复制到 Agent 可读的证据目录，并提供控制器从磁盘读取的实际文件快照；禁止子 Agent 递归创建未计数的团队。2026-10-27 按用户要求迁移为火山 Coding Plan `glm-5.3-flash`，并添加不回退 OpenAI 的硬性检查。
 
-所有变更限于本项目，没有修改用户全局 Codex 配置，没有购买服务或提交任何微信发布操作。早期失败诊断保留在 `.workflow/live-diagnostic-*` 中供追踪，最终结果以 `live-diagnostic-result.json` 为准。
+## 2026-10-27 运行时迁移记录：Codex → ZCode 本地 Harness
 
-当前真实开发状态初始化为 ready，尚未执行选题 Agent。运行 `npm run workflow -- watch` 后才开始真实游戏的选题与设计，并在 H1 等待你审阅已生成的材料。
+背景：火山 Coding Plan `glm-5.3-flash` 走 Codex CLI 的 `responses` 协议（`/api/coding/v3`）时**不能发起任何工具调用**——探针实验显示 5 次尝试全部为模型编造完成报告（0 次工具调用、产物不存在、把计划当 blocked 理由）。同一模型走火山 **Anthropic 兼容协议**（`/api/coding`）+ ZCode Harness 时工具循环正常（与本桌面会话同源，行为一致）。
+
+迁移内容与验证：
+
+| 验证 | 结果 | 证据与边界 |
+|---|---|---|
+| 工具调用最小探针 | 通过 | 读 `brief.md` 第 1 行原文一字不差返回；Codex 下同探针返回空串并谎称已用工具 |
+| 写权限边界 | 部分受限 | `plan` 模式实测只读（审查者可用）；`build` 需权限客户端、无头下拒绝写入；工作者只能用 `yolo`——**无文件系统级沙箱**，靠任务书约束 + 产物指纹 + 只读审查兜底 |
+| `--attach` 长任务书注入 | 通过 | 附件口令原文回传，最终回复为纯 JSON |
+| 真实链路冒烟 | 通过 | `node tools/smoke.mjs`，ZCode→火山 Anthropic 协议→glm-5.3-flash，用量上报完整 |
+| 控制器自动测试 | 23 / 23 通过 | 含新的运行时锁定断言（kind/model/入口缺失报错） |
+| **01-concept 真实运行** | **通过，停在 H1** | 工作者真实执行多步工具循环（探索工作区、联网调研：维基/百度/必应/微信文档并如实记录超时与 403，拒绝编造市场数据）；产出 `deliverables/01-concept.md`（10.8KB）、`game-design.md`（9.2KB）与检查证据；producer 只读审查通过；观测用量 710,586 tokens |
+
+迁移中发现并处理：CLI 0.16.5 的 `--help` 列出 `--max-turns` 但解析器拒绝该参数，已移除并以单次调用超时兜底；`~/.zcode/cli/config.json` 为 CLI 独立配置（供应商 `ark`，无内联密钥）；Codex 相关的 `windowsSandbox` 与代理设置已从局部配置移除。
+
+边界声明：真实游戏仍未制作；H1 之后各阶段待逐个执行；真机、上传、提审、发布均未发生。
+
+所有变更限于本项目，没有购买服务或提交任何微信发布操作；`ARK_API_KEY` 只存在于 Windows 用户环境变量，未进入仓库、提示词或游戏包。历史失败诊断保留在 `.workflow/events.jsonl` 与各运行日志中供追踪。

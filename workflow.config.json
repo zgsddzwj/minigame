@@ -2,13 +2,11 @@
   "version": 1,
   "workspace": "game-workspace",
   "agentRuntime": {
-    "kind": "volcengine-coding-plan",
+    "kind": "zcode-local",
     "model": "glm-5.3-flash",
-    "modelProvider": "volcengine-coding-plan",
-    "baseUrl": "https://ark.cn-beijing.volces.com/api/coding/v3",
     "apiKeyEnv": "ARK_API_KEY",
-    "inheritUserConfig": false,
     "entrypoint": null,
+    "cliScript": null,
     "timeoutMinutes": 20
   },
   "limits": {

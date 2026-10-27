@@ -2,7 +2,7 @@
 
 可以一个人完成小体量微信小游戏。这个项目提供主 Agent、9 个专业子 Agent 的任务书，以及可运行的持久化编排器，覆盖选题、方案、原型、美术、开发、微信接入、测试、发行与运营准备。
 
-默认方案是 **Cocos Creator 3.8 LTS + TypeScript + 火山引擎 Coding Plan（glm-5.3-flash）+ 微信开发者工具**。本地使用 Codex CLI 作为文件和命令执行外壳，模型请求固定发送到 Coding Plan 专用地址，不消耗 OpenAI/Codex 模型额度。首款限定为 2D 竖屏、单手、短局、离线核心玩法。
+默认方案是 **Cocos Creator 3.8 LTS + TypeScript + 火山引擎 Coding Plan（glm-5.3-flash）+ 微信开发者工具**。本地使用 ZCode（桌面版内置 CLI）的无头模式作为文件和命令执行外壳，通过火山引擎 Anthropic 兼容协议调用 glm-5.3-flash，密钥只经环境变量 `ARK_API_KEY` 注入，不消耗 OpenAI/Codex 模型额度。首款限定为 2D 竖屏、单手、短局、离线核心玩法。
 
 本次交付的是工作流工具包。真实游戏尚未制作，真实微信构建、真机和发布尚未验证。完整说明见 [工作流设计](docs/WORKFLOW.md)，平台动作见 [发行手册](docs/RELEASE.md)。
 
@@ -72,6 +72,6 @@ game-workspace/          游戏代码与阶段产物（工作 Agent 可写）
 docs/                    完整工作流、发行手册、资料来源
 ```
 
-Coding Plan 模型冒烟可用 `node tools/smoke.mjs`，会消耗少量 Coding Plan 套餐额度。运行时强制使用 `https://ark.cn-beijing.volces.com/api/coding/v3`；拒绝普通 `/api/v3`，避免产生额外按量费用。缺少 `ARK_API_KEY` 时工作流直接停止，不会回退到 OpenAI/Codex。
+Coding Plan 模型冒烟可用 `node tools/smoke.mjs`，会消耗少量 Coding Plan 套餐额度。ZCode 运行时供应商固定为 `ark`（Anthropic 兼容协议 `https://ark.cn-beijing.volces.com/api/coding`），密钥从环境变量 `ARK_API_KEY` 读取，不使用普通 `/api/v3` 按量地址。缺少 `ARK_API_KEY` 时工作流直接停止，不会回退到 OpenAI/Codex。
 
 发行上传需要另装并锁定 `miniprogram-ci`；没有 AppID、上传密钥和明确版本授权时不会上传。**上传成功、提审、审核通过、正式发布分别记录。**

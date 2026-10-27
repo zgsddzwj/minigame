@@ -18,9 +18,9 @@ function show(state) {
 async function doctor() {
   const report = { node: process.version, nodeSupported: Number(process.versions.node.split('.')[0]) >= 20, agentRuntime: {}, cocos: {}, wechat: {} };
   try {
-    const [cmd, ...prefix] = resolveAgentRuntime(flow.config.agentRuntime);
-    const result = await execute(cmd, [...prefix, '--version'], { timeoutMs: 15000 });
-    report.agentRuntime = { entrypoint: [cmd, ...prefix], version: result.stdout.trim(), provider: flow.config.agentRuntime.kind, model: flow.config.agentRuntime.model, baseUrl: flow.config.agentRuntime.baseUrl, apiKeyEnv: flow.config.agentRuntime.apiKeyEnv, apiKeyConfigured: Boolean(process.env[flow.config.agentRuntime.apiKeyEnv]), usesOpenAIQuota: false };
+    const [cmd, script] = resolveAgentRuntime(flow.config.agentRuntime);
+    const result = await execute(cmd, [script, '--version'], { timeoutMs: 30000, env: flow.agentEnvironment() });
+    report.agentRuntime = { entrypoint: [cmd, script], version: result.stdout.trim(), provider: flow.config.agentRuntime.kind, model: flow.config.agentRuntime.model, apiKeyEnv: flow.config.agentRuntime.apiKeyEnv, apiKeyConfigured: Boolean(process.env[flow.config.agentRuntime.apiKeyEnv]), usesOpenAIQuota: false };
   } catch (error) { report.agentRuntime.error = error.message; }
   report.cocos = { configuredPath: flow.config.tools.cocosExecutable, found: Boolean(flow.config.tools.cocosExecutable && fs.existsSync(flow.config.tools.cocosExecutable)), note: '未配置不等于未安装；需要在 workflow.local.json 填准确路径，并做一次真实构建。' };
   report.wechat = { configuredPath: flow.config.tools.wechatCli, found: Boolean(flow.config.tools.wechatCli && fs.existsSync(flow.config.tools.wechatCli)), note: '文件存在不代表已经登录或具有目标 AppID 的权限。' };

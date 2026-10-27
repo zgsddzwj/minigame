@@ -13,8 +13,8 @@
 | 层 | 选择 | 适合本项目的原因 |
 |---|---|---|
 | 主控 | Node.js 持久状态机 + 制作人 Agent | 状态不丢、便于测试，模型只做需要判断的工作 |
-| Agent 执行 | Codex CLI `exec` 作为本地工具外壳，JSON 输出与 schema | 能读写工程、执行检查；不使用其 OpenAI 登录额度 |
-| 模型服务 | 火山引擎 Coding Plan，固定 `glm-5.3-flash` | 使用用户已有套餐；模型与专用 Base URL 均由控制器强校验 |
+| Agent 执行 | ZCode 本地 Harness（桌面版内置 CLI，无头 `--prompt` 模式，任务书经 `--attach` 注入） | 工作者 yolo 可写、审查者 plan 只读；结构化 JSON 结果经控制器校验 |
+| 模型服务 | 火山引擎 Coding Plan（Anthropic 兼容协议），固定 `glm-5.3-flash` | 使用用户已有套餐；密钥经 `ARK_API_KEY` 环境变量注入 |
 | 游戏引擎 | Cocos Creator 3.8 LTS 系列 | 官方提供微信小游戏适配、编辑器、资源系统和构建路径 |
 | 游戏代码 | TypeScript；核心规则纯逻辑 | 可独立测试，微信适配不会污染规则 |
 | 包管理 | npm + 精确版本 + lockfile | 本机可用；减少工具数量，避免依赖漂移 |
@@ -26,7 +26,7 @@
 
 3.8 系列的具体补丁版本在架构阶段验证后锁定；不是要求所有机器随时升级到“最新”。控制器已在本机 Node 20.20.0 上验证，运行兼容 Node ≥20；正式生产机器应采用仍受支持的 Node 版本，并与工具依赖一起锁定。此处不将本机现有旧版本当作长期升级建议。
 
-子 Agent 默认不加载全局桌面插件配置（inheritUserConfig=false），使用原生命令工具；控制器显式配置 `volcengine-coding-plan` provider、`glm-5.3-flash` 和 Coding Plan 专用地址。子进程会移除 `OPENAI_API_KEY` 与 `CODEX_API_KEY`，缺少 `ARK_API_KEY` 就停止，因此不会回退消耗 OpenAI/Codex 额度。若需要插件，先在隔离诊断中验证，再显式开启继承。角色会话为 ephemeral，进度与证据由本项目持久化。
+子 Agent 以 ZCode CLI 无头模式运行（`ELECTRON_RUN_AS_NODE` 启动 `resources/glm/zcode.cjs`），工作目录锁定为 game-workspace；审查者使用 plan 只读模式。控制器配置供应商 `ark`、模型 `glm-5.3-flash`，密钥经环境变量注入。子进程会移除 `OPENAI_API_KEY` 与 `CODEX_API_KEY`，缺少 `ARK_API_KEY` 就停止，因此不会回退消耗其他额度。已知边界：ZCode 无头模式没有文件系统级沙箱，工作者写入范围依赖任务书约束，并由控制器的产物指纹校验与只读审查兜底。
 
 为什么不先上多套 Agent 框架、消息队列和 Kubernetes：这个范围内，顺序依赖与一个写入者已经足够；可测试的状态机能解决持久进度、重试和门禁。未来有多项目、远程工人或团队并发再扩展。这里是任务级角色协作，默认顺序执行；不是声称已有并发集群。
 

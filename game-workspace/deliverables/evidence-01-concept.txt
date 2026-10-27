@@ -1,0 +1,82 @@
+# 01-concept 交付物校验证据
+日期: 2026-10-27 18:29:01
+命令: node C:/Users/zgsdd/AppData/Local/Temp/check-01-concept.mjs (cwd=game-workspace)
+node: v20.20.0
+```
+PASS 01-concept.md 非空且有实质内容
+PASS game-design.md 非空且有实质内容
+PASS 01-concept 含 ### 候选 A
+PASS 01-concept 含 ### 候选 B
+PASS 01-concept 含 ### 候选 C
+PASS 01-concept 候选要素：输入→反馈→奖励循环
+PASS 01-concept 候选要素：复玩驱动
+PASS 01-concept 候选要素：失败/胜利规则
+PASS 01-concept 候选要素：内容成本
+PASS 01-concept 候选要素：技术风险
+PASS 01-concept 候选要素：潜在变现
+PASS 01-concept 候选要素：目标玩家
+PASS 01-concept 评分/推荐：| 维度 |
+PASS 01-concept 评分/推荐：**推荐：候选 A
+PASS 01-concept 评分/推荐：开发复杂度
+PASS 01-concept 评分/推荐：趣味验证成本
+PASS 01-concept 评分/推荐：平台适配
+PASS 01-concept 评分/推荐：素材成本
+PASS 01-concept 评分/推荐：差异点
+PASS 01-concept 评分/推荐：一页决策材料
+PASS 01-concept 诚实标注：调研状态与诚实声明
+PASS 01-concept 诚实标注：未核实
+PASS 01-concept 诚实标注：不构成收入预测
+PASS 01-concept 诚实标注：待核实清单
+PASS 01-concept 资质待核实项 V-1
+PASS 01-concept 资质待核实项 V-2
+PASS 01-concept 资质待核实项 V-3
+PASS 01-concept 资质待核实项 V-4
+PASS 01-concept 资质待核实项 V-5
+PASS 01-concept 资质待核实项 V-6
+PASS game-design 章节：状态机
+PASS game-design 章节：规则示例
+PASS game-design 章节：数值初值
+PASS game-design 章节：教程
+PASS game-design 章节：存档
+PASS game-design 章节：声音与振动
+PASS game-design 章节：竖屏
+PASS game-design 章节：失败与重开
+PASS game-design 章节：验收标准
+PASS game-design 章节：模块边界
+PASS game-design MVP 功能 MVP-F1
+PASS game-design MVP 功能 MVP-F2
+PASS game-design MVP 功能 MVP-F3
+PASS game-design MVP 功能 MVP-F4
+PASS game-design MVP 功能 MVP-F5
+PASS game-design MVP 功能 MVP-F6
+PASS game-design MVP 功能不超过 6 项
+PASS game-design 不做清单 NOT-1
+PASS game-design 不做清单 NOT-2
+PASS game-design 不做清单 NOT-3
+PASS game-design 不做清单 NOT-4
+PASS game-design 不做清单 NOT-5
+PASS game-design 不做清单 NOT-6
+PASS game-design 不做清单 NOT-7
+PASS game-design 不做清单 NOT-8
+PASS game-design 不做清单 NOT-9
+PASS game-design 不做清单 NOT-10
+PASS game-design 验收标准 AC-1
+PASS game-design 验收标准 AC-2
+PASS game-design 验收标准 AC-3
+PASS game-design 验收标准 AC-4
+PASS game-design 验收标准 AC-5
+PASS game-design 验收标准 AC-6
+PASS game-design 验收标准 AC-7
+PASS game-design 验收标准 AC-8
+PASS game-design 验收标准 AC-9
+PASS game-design 验收标准 AC-10
+PASS 无越权完成声明：已上线
+PASS 无越权完成声明：发布成功
+PASS 无越权完成声明：审核通过
+PASS 无越权完成声明：真机验证通过
+PASS 无越权完成声明：微信真机通过
+PASS 无越权完成声明：已提审
+RESULT: ALL CHECKS PASSED
+```
+exit=0
+复跑 exit=0

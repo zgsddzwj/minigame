@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Workflow, inside, readJson, writeJson, validateRelease, packageInventory, packageHash, verifyApproval, execute, reviewBundle, hash, codingPlanProviderArgs } from '../tools/core.mjs';
+import { Workflow, inside, readJson, writeJson, validateRelease, packageInventory, packageHash, verifyApproval, execute, reviewBundle, hash, validateAgentRuntime, resolveAgentRuntime } from '../tools/core.mjs';
 import { copyFixture, simulatedProvider, simulatedDeviceEvidence } from '../tools/simulation.mjs';
 
 const source = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -205,21 +205,16 @@ test('审查交接包含真实文件全文与哈希，过大文件明确列为�
   assert.equal(bundle.omitted.find(file => file.path === 'deliverables/large.md').reason, 'context_limit');
 });
 
-test('Coding Plan 固定使用专用套餐地址和 glm-5.3-flash', () => {
+test('ZCode 运行时固定 glm-5.3-flash 并拒绝其他服务', () => {
   const flow = fixture();
-  const args = codingPlanProviderArgs(flow.config.agentRuntime).join(' ');
-  assert.match(args, /volcengine-coding-plan/);
-  assert.match(args, /api\/coding\/v3/);
-  assert.doesNotMatch(args, /base_url="https:\/\/ark\.cn-beijing\.volces\.com\/api\/v3"/);
+  assert.equal(flow.config.agentRuntime.kind, 'zcode-local');
   assert.equal(flow.config.agentRuntime.model, 'glm-5.3-flash');
+  assert.throws(() => validateAgentRuntime({ ...flow.config.agentRuntime, kind: 'volcengine-coding-plan' }), /不支持的 Agent 服务/);
+  assert.throws(() => validateAgentRuntime({ ...flow.config.agentRuntime, model: 'glm-4.5-air' }), /固定使用 glm-5.3-flash/);
 });
 
-test('拒绝普通火山按量 API 地址', () => {
-  assert.throws(() => fixture(undefined, root => {
-    const config = readJson(path.join(root, 'workflow.config.json'));
-    config.agentRuntime.baseUrl = 'https://ark.cn-beijing.volces.com/api/v3';
-    writeJson(path.join(root, 'workflow.config.json'), config);
-  }), /拒绝可能产生额外按量费用/);
+test('ZCode 入口缺失时报错而不是静默回退', () => {
+  assert.throws(() => resolveAgentRuntime({ kind: 'zcode-local', model: 'glm-5.3-flash', apiKeyEnv: 'ARK_API_KEY', entrypoint: 'Z:/no/ZCode.exe', cliScript: 'Z:/no/zcode.cjs' }), /找不到 ZCode/);
 });
 
 test('子 Agent 环境删除 OpenAI 凭据并保留 Coding Plan 环境变量', () => {

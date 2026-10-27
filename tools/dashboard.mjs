@@ -46,8 +46,14 @@ function stageRows(state) {
 function publicState() {
   const state = readState();
   let orphan = null;
-  try { orphan = readJson(path.join(flow.runtime, 'active-worker.json')); } catch { }
-  return {
+  try {
+    const worker = readJson(path.join(flow.runtime, 'active-worker.json'));
+    if (worker) {
+      let alive = true;
+      try { process.kill(worker.pid, 0); } catch (error) { if (error.code === 'ESRCH') alive = false; }
+      if (!alive) orphan = { pid: worker.pid, stage: worker.stage, role: worker.role };
+    }
+  } catch { }  return {
     initialized: Boolean(state),
     status: state?.status || 'uninitialized',
     mode: state?.mode || null,
@@ -447,7 +453,15 @@ function render() {
     $('pctText').textContent = done + ' / ' + st.stages.length + ' 阶段完成 · 发行状态 ' + st.publicationStatus;
     var stepper = $('stepper'); stepper.textContent = '';
     st.stages.forEach(function (s) { stepper.appendChild(el('span', 'step ' + s.status, s.id + ' ' + (s.name) + (s.attempts ? ' (' + s.attempts + '次)' : ''))); });
-    var msg = $('msg'); msg.textContent = st.message || ''; msg.className = 'msg' + (['blocked', 'interrupted', 'paused_budget'].indexOf(st.status) >= 0 ? ' err' : '');
+    var msg = $('msg');
+    if (st.status === 'running') {
+      var runStage = st.stages.filter(function (s2) { return s2.status === 'running'; })[0];
+      msg.textContent = runStage ? ('正在执行 ' + runStage.id + ' · ' + runStage.name + '（Agent 工作中，完成后自动继续，请勿关闭终端）') : '正在执行…';
+      msg.className = 'msg';
+    } else {
+      msg.textContent = st.message || '';
+      msg.className = 'msg' + (['blocked', 'interrupted', 'paused_budget'].indexOf(st.status) >= 0 ? ' err' : '');
+    }
     $('orphan').textContent = st.orphanWorker ? ('⚠ 检测到疑似残留子进程 pid=' + st.orphanWorker.pid + '（' + st.orphanWorker.stage + ' / ' + st.orphanWorker.role + '），如已确认进程不在，删除 .workflow/active-worker.json 后 retry。') : '';
     $('busy').textContent = st.dashboardBusy ? '（执行中…）' : '';
     $('runBtn').disabled = st.dashboardBusy || !st.initialized || ['running', 'waiting_human', 'blocked', 'paused_budget', 'interrupted', 'complete'].indexOf(st.status) >= 0;

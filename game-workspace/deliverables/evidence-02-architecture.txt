@@ -1,0 +1,111 @@
+02-architecture 工具链探针与成品校验证据
+=====================================================
+执行日期：2026-10-27（本地时区 Asia/Shanghai，UTC+8）
+执行角色：architect（专业子 Agent，ZCode 本地 Harness / glm-5.3-flash）
+工作根目录：C:\Users\zgsdd\Desktop\projects\minigame\game-workspace
+说明：以下 P 系列（Probe）为真实执行过的命令及其输出摘要，exit 为实际退出码；
+网络与磁盘探测结果只反映执行时刻状态。C 系列为交付物写入后的成品校验记录。
+背景：上一次架构师进程因 Dashboard 终端关闭而中断，本次为温和恢复的重新执行；
+恢复时交付物目录仅有 01 阶段文件，02 阶段产物为本次全新产出。
+
+---------- P. 工具链探针（2026-10-27 18:58–19:12 实测） ----------
+
+[P1] node --version
+  exit=0  stdout=v20.20.0
+
+[P2] npm --version
+  exit=0  stdout=10.8.2
+
+[P3] npm config get registry
+  exit=0  stdout=https://registry.npmjs.org/
+
+[P4] 网络探测（curl -s -o /dev/null -w "%{http_code} %{time_total}s" --max-time 10）
+  https://registry.npmjs.org/typescript          -> 200，7.19 s（可达，较慢）
+  https://registry.npmmirror.com/typescript      -> 200，3.33 s（镜像可达，可作回退）
+  https://developers.weixin.qq.com/minigame/dev/guide/ -> 200（可达；01 阶段已实测该站正文为 JS 渲染壳，
+      仅作资料渠道不作依据；本次未引用其中任何控制性内容）
+
+[P5] git --version
+  exit=0  stdout=git version 2.53.0.windows.1
+
+[P6] Cocos Creator 编辑器检索 —— 未发现安装
+  ls C:/ProgramData/cocos/editors                                  -> 不存在
+  ls "C:/Program Files/Cocos"                                      -> 不存在
+  ls "$LOCALAPPDATA" 与 "$APPDATA" | grep -i cocos                 -> 无匹配
+  ls "C:/Program Files" | grep -i cocos                            -> 无匹配
+  find "C:/Program Files (x86)" "C:/Program Files" "C:/ProgramData" "C:/Users/zgsdd" \
+       -maxdepth 5 -iname "CocosCreator.exe"                       -> 无结果
+  reg query HKLM/HKCU "...CurrentVersion\Uninstall" /s /f "Cocos"  -> 无卸载登记
+  磁盘清单（PowerShell Get-PSDrive -PSProvider FileSystem）         -> 仅 C: 一块盘
+  结论：Cocos Creator 编辑器未安装。engineVersion 置 null，不捏造补丁版本。
+
+[P7] Cocos Dashboard（已安装，未下载任何编辑器）
+  安装路径：C:\Program Files (x86)\CocosDashboard（目录时间戳 2026-10-27 16:42，为今日新装）
+  exe 文件版本：(Get-Item 'C:\Program Files (x86)\CocosDashboard\CocosDashboard.exe').VersionInfo
+      -> FileVersion=2.2.1  ProductVersion=2.2.1（以此为准）
+  安装目录 version 文件内容 -> "31.3.1"（6 字节；内部构建号语义未确认，仅如实记录）
+  "$APPDATA"/"$LOCALAPPDATA" 下无 CocosDashboard 配置目录 -> 未见启动记录
+  Dashboard 默认编辑器下载目录 C:\ProgramData\cocos\editors 不存在 -> 编辑器未下载
+
+[P8] 微信开发者工具 CLI（已安装且 CLI 本体可运行）
+  路径：C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat（存在）
+  调用方式：因中文路径在 GBK 批处理中被转码损坏，改用 PowerShell EncodedCommand
+      （Node 生成 UTF-16LE Base64）执行：
+      & "C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat" -h
+  exit=0；stdout 为命令清单，含：cloud / open / login / islogin / preview / auto-preview /
+      upload / build-npm / auto / auto-replay / agent / reset-fileutils / close / quit /
+      cache / engine / open-other / build-ipa / build-apk，以及 --project/--appid/--port/
+      --token/--lang 全局选项
+  IDE 版本：未知（null）——配置目录 "$APPDATA/微信开发者工具" 存在但未发现版本文件；
+      获取方式=IDE「设置-关于」面板或启动日志，留待 06 阶段实测回填。
+  限制：preview/upload/build-npm 等项目命令需要 IDE 启动、开启服务端口并登录（用户本人扫码）；
+      本次仅验证 CLI 可执行，未登录状态未探测（不在架构阶段启动 IDE）。
+
+[P9] 引擎版本锁定结论与最小解锁动作
+  engineVersion=null（编辑器未安装，禁止捏造补丁版本）。
+  最小人工动作：用户在已安装的 Cocos Dashboard（2.2.1）内安装 Creator 3.8 LTS 系列最新补丁
+      （下载约 1–2 GB，等待时间不可控）；安装后以
+      "<编辑器目录>\CocosCreator.exe --version" 实测输出回填 deliverables/toolchain.json，
+      并在 03-prototype 用真实工程构建再次验证后方可冻结。
+  架构与方案设计不受影响（按角色规则：缺编辑器时方案可完成，原型开发不得声称引擎已可用）。
+
+---------- C. 成品校验（交付物写入后执行，追加于 2026-10-27 19:1x） ----------
+
+[C1] JSON 解析与必需字段校验（node 内联脚本，实际执行 exit=0，15 项检查全部 PASS）
+  deliverables/backlog.json
+    tasks=18 项（todo=13，waiting-user=5）；id 唯一；每项 id/title/dependencies/
+    acceptance/status 字段齐全；dependencies 引用均存在；status 取值全部合法
+  deliverables/toolchain.json
+    nodeVersion 与运行时一致（20.20.0）；packageManager.name=npm；
+    engine.patchVersion=null（未知如实置空，未捏造）；wechatDevtools.cliPath 在磁盘上存在；
+    buildTarget.platform=wechatgame 且 cliSuccessExitCode=36；unknowns 记录 8 项
+  完整输出摘要（逐行 PASS/FAIL）：
+    PASS backlog.tasks is array
+    INFO backlog.tasks.length=18
+    PASS backlog ids unique
+    INFO status counts: {"waiting-user":5,"todo":13}
+    PASS backlog required fields/dependencies/status complete
+    PASS toolchain.nodeVersion matches runtime v20.20.0
+    PASS toolchain.packageManager=npm
+    PASS toolchain.engine.patchVersion=null (honest unknown)
+    PASS toolchain.wechatDevtools.cliPath exists on disk
+    PASS buildTarget=wechatgame, successExit=36
+    PASS toolchain.unknowns recorded (8)
+    PASS exists deliverables/02-architecture.md
+    PASS exists deliverables/backlog.json
+    PASS exists deliverables/toolchain.json
+    PASS exists deliverables/evidence-02-architecture.txt
+    PASS no premature game/ project code at stage 02
+    SUMMARY: ALL CHECKS PASSED
+    VALIDATION_EXIT=0
+[C2] 产物与证据存在性校验（工作区相对路径，均存在，见上逐行 PASS）
+  deliverables/02-architecture.md
+  deliverables/backlog.json
+  deliverables/toolchain.json
+  deliverables/evidence-02-architecture.txt（本文件）
+[C3] SHA256（certutil -hashfile SHA256 实测；权威值以控制器磁盘快照为准）
+  deliverables/02-architecture.md = b722ce35054bc791bc7dc56af0172b0c8ed02327595088e80770d3d9bf0eb6b2
+  deliverables/backlog.json       = 4011556dc04ca2034f403e56e12813a05d86a4a8e4f2f1a18bb834ec9540921d
+  deliverables/toolchain.json     = 8ec7e9ccd8e46c85f54041ae60e36dbb13f05f9fb5d0dab8284b3ec8f579cc48
+
+（证据文件定稿，之后不再修改；如需重验请以控制器快照为准）

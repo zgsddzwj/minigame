@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "comment": "节气跳跳 数值唯一源（game-design §5；H2 返工调校 v2：蓄力节奏放慢到 2.0s、首档加宽收窄 gap、新增 novice 前 2 跳保护）。调参只改本文件，改后运行 npm run sync-data 同步到工程。",
+  "charge": {
+    "maxDurationSec": 2.0,
+    "minDistancePx": 120,
+    "maxDistancePx": 640
+  },
+  "jump": {
+    "durationSec": 0.55,
+    "arcHeightPx": 180
+  },
+  "landing": {
+    "perfectThresholdPx": 18,
+    "safeInsetPx": 4,
+    "stumbleBandPx": 20
+  },
+  "novice": {
+    "comment": "新手保护：前 jumpCount 跳目标台用固定 gapPx（不抽随机），Perfect 阈值放宽为 perfectThresholdPx",
+    "jumpCount": 2,
+    "gapPx": 120,
+    "perfectThresholdPx": 24
+  },
+  "stage": {
+    "first": { "widthPx": 200 },
+    "gapMeaning": "edge-to-edge（前后台座顶面边缘净距）；台座中心距 = 前半宽 + gap + 后半宽",
+    "brackets": [
+      { "maxScore": 9, "widthMin": 190, "widthMax": 230, "gapMin": 100, "gapMax": 200 },
+      { "maxScore": 29, "widthMin": 120, "widthMax": 180, "gapMin": 150, "gapMax": 320 },
+      { "maxScore": null, "widthMin": 100, "widthMax": 160, "gapMin": 180, "gapMax": 420 }
+    ]
+  },
+  "score": {
+    "safePoints": 1,
+    "perfectPoints": 2,
+    "comboBonusMax": 4,
+    "milestoneEvery": 5
+  },
+  "save": {
+    "key": "save_v1",
+    "version": 1
+  }
+}

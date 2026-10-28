@@ -1,0 +1,25 @@
+{
+  "name": "jieqi-tiaotiao",
+  "version": "0.1.0",
+  "private": true,
+  "creator": {
+    "version": "3.8.8"
+  },
+  "description": "节气跳跳 灰盒原型（Cocos Creator 3.8.8 工程）",
+  "scripts": {
+    "verify": "node scripts/verify.mjs",
+    "typecheck": "tsc -p tsconfig.check.json --noEmit",
+    "test:unit": "vitest run",
+    "sync-data": "node scripts/sync-data.mjs",
+    "gen-audio": "node scripts/gen-audio.mjs",
+    "preview": "node scripts/serve-web.mjs",
+    "smoke": "node tests/web/smoke.mjs",
+    "screens": "node scripts/capture-screens.mjs"
+  },
+  "uuid": "806928b6-f86f-4847-89e6-ce7d24e5c7e2",
+  "devDependencies": {
+    "playwright": "1.64.1",
+    "typescript": "7.0.2",
+    "vitest": "3.2.4"
+  }
+}

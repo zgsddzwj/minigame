@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "generatedAt": "2026-10-27T19:12:21+08:00",
+  "source": "deliverables/02-architecture.md",
+  "statusValues": ["todo", "doing", "done", "blocked", "waiting-user"],
+  "tasks": [
+    {
+      "id": "T-0001",
+      "title": "安装 Cocos Creator 3.8 LTS 编辑器（Cocos Dashboard 2.2.1 已装、编辑器未下载）",
+      "stage": "02-architecture",
+      "owner": "user",
+      "dependencies": [],
+      "acceptance": "Dashboard 内完成 Creator 3.8 LTS 系列安装；执行 \"<编辑器目录>\\CocosCreator.exe --version\" 输出 3.8.x 并回填 deliverables/toolchain.json，记录留存 evidence",
+      "status": "waiting-user"
+    },
+    {
+      "id": "T-0002",
+      "title": "注册小游戏 AppID 并完成开发者工具本人扫码登录（对应 V-1）",
+      "stage": "02-architecture",
+      "owner": "user",
+      "dependencies": [],
+      "acceptance": "微信开发者工具中可用该 AppID 新建/打开小游戏项目；主体类型、类目口径记录留档（不阻塞 03–05）",
+      "status": "waiting-user"
+    },
+    {
+      "id": "T-0003",
+      "title": "准备 Android/iOS 真机各至少 1 台并登记（对应 V-6）",
+      "stage": "02-architecture",
+      "owner": "user",
+      "dependencies": ["T-0002"],
+      "acceptance": "07 阶段可提供设备型号/系统/微信版本清单并完成真机预览",
+      "status": "waiting-user"
+    },
+    {
+      "id": "T-0004",
+      "title": "类目资质、ICP 备案与适龄合规材料确认（对应 V-2/V-3/V-5）",
+      "stage": "02-architecture",
+      "owner": "user",
+      "dependencies": ["T-0002"],
+      "acceptance": "以官方后台实际提示为准的材料清单留档；备案状态可查；提审前齐备",
+      "status": "waiting-user"
+    },
+    {
+      "id": "T-0005",
+      "title": "流量主/广告资格确认（对应 V-4；可选）",
+      "stage": "02-architecture",
+      "owner": "user",
+      "dependencies": ["T-0002"],
+      "acceptance": "资格确认前 rewardedAd 保持 disabled 且无 UI 入口；确认后另行评审接入方案",
+      "status": "waiting-user"
+    },
+    {
+      "id": "T-0301",
+      "title": "初始化 Cocos 3.8 LTS 真实工程与目录骨架",
+      "stage": "03-prototype",
+      "owner": "prototype",
+      "dependencies": ["T-0001"],
+      "acceptance": "用真实编辑器/CLI 从官方模板生成 game/ 工程；竖屏 750x1334 fitWidth；目录含 assets/scripts/{core,presentation,platform}、scenes、resources/config；tsconfig strict 生效",
+      "status": "todo"
+    },
+    {
+      "id": "T-0302",
+      "title": "落地 game/scripts/verify.mjs 四入口与 sync-data.mjs（按 02-architecture §8 契约）",
+      "stage": "03-prototype",
+      "owner": "prototype",
+      "dependencies": ["T-0301"],
+      "acceptance": "prototype/development/wechat/release 四入口可调用；任一前置缺失或子步骤失败均非零退出并给出明确原因，禁止静默跳过；core 纯净性 grep 生效",
+      "status": "todo"
+    },
+    {
+      "id": "T-0303",
+      "title": "core 五模块 + RNG/EventSink + data 数值表 + Vitest 单测",
+      "stage": "03-prototype",
+      "owner": "prototype",
+      "dependencies": ["T-0301"],
+      "acceptance": "ChargeSim/LandingJudge/ScoreService/StageGen/SaveData 全部纯函数化；单测覆盖 game-design §4 例1~例6、§5 边界值、save_v1 坏档兜底；同 seed 同输入判定可复现；core 内无 cc/wx/DOM",
+      "status": "todo"
+    },
+    {
+      "id": "T-0304",
+      "title": "PlatformService 双实现（Web/Wechat）",
+      "stage": "03-prototype",
+      "owner": "prototype",
+      "dependencies": ["T-0303"],
+      "acceptance": "storage/lifecycle/audio/device 双端实现；share/rewardedAd/analytics 为 disabled 实现且无 UI 入口；wx 调用仅存在于 wechat.ts；Web 端 visibilitychange 模拟 onHide 触发自动暂停",
+      "status": "todo"
+    },
+    {
+      "id": "T-0305",
+      "title": "五状态机场景与表现层（Boot/Home/Playing/Paused/GameOver）",
+      "stage": "03-prototype",
+      "owner": "prototype",
+      "dependencies": ["T-0303"],
+      "acceptance": "状态迁移与 game-design §3 一致（含切后台自动暂停）；蓄力下蹲/起跳抛物线/落点反馈/踉跄/坠落动画成立；灰盒程序绘制；仅取第一指输入",
+      "status": "todo"
+    },
+    {
+      "id": "T-0306",
+      "title": "教程、暂停/回首页/一键重开、音效与振动开关（MVP-F4~F6）",
+      "stage": "03-prototype",
+      "owner": "prototype",
+      "dependencies": ["T-0305"],
+      "acceptance": "首局三步教程可跳过且完成后不再出现（清档复现）；失败→新局 1 次点击；开关即时生效且写存档；Perfect 轻振动受 haptics 控制",
+      "status": "todo"
+    },
+    {
+      "id": "T-0307",
+      "title": "prototype 入口全绿并产出 03 阶段文档 → H2 试玩",
+      "stage": "03-prototype",
+      "owner": "prototype",
+      "dependencies": ["T-0302", "T-0306"],
+      "acceptance": "node game/scripts/verify.mjs prototype 退出码 0（真实执行留证）；deliverables/03-prototype.md 与 prototype-test.json 完整、含试玩入口说明",
+      "status": "todo"
+    },
+    {
+      "id": "T-0401",
+      "title": "节气主题程序绘制 skin 与 UI 视觉定稿 → H3",
+      "stage": "04-art",
+      "owner": "artist",
+      "dependencies": ["T-0307"],
+      "acceptance": "真实游戏画面截取与关键页面样张；ui-preview.png 与 asset-manifest.json 与工程实际一致；不与胶囊/安全区重叠",
+      "status": "todo"
+    },
+    {
+      "id": "T-0501",
+      "title": "正式开发整合与 feature-matrix → verify development 全绿",
+      "stage": "05-development",
+      "owner": "developer",
+      "dependencies": ["T-0401"],
+      "acceptance": "视觉资产替换灰盒且不破坏规则层；性能采样 debug overlay 可用；node game/scripts/verify.mjs development 退出码 0；feature-matrix.json 与 MVP-F1~F6/NOT 清单对齐",
+      "status": "todo"
+    },
+    {
+      "id": "T-0601",
+      "title": "微信能力接入与 wechatgame 构建验证",
+      "stage": "06-wechat",
+      "owner": "platform",
+      "dependencies": ["T-0501", "T-0002"],
+      "acceptance": "胶囊/安全区真机适配参数生效；wx.onHide 自动暂停真机复验；build-config.json 导出构建 JSON；CLI 构建退出码 36 且产物结构检查通过；node game/scripts/verify.mjs wechat 退出码 0；platform-matrix.json 完整",
+      "status": "todo"
+    },
+    {
+      "id": "T-0701",
+      "title": "QA 测试、性能采样与真机验收 → H4",
+      "stage": "07-qa",
+      "owner": "qa",
+      "dependencies": ["T-0601", "T-0003"],
+      "acceptance": "node game/scripts/verify.mjs release 退出码 0；qa-results.json 记录设备/系统/微信版本/包版本/耗时/帧率/异常；日志卫生检查通过；浏览器结果不得标注为真机结果",
+      "status": "todo"
+    },
+    {
+      "id": "T-0801",
+      "title": "生成发行候选与上架材料 → H5",
+      "stage": "08-release",
+      "owner": "release",
+      "dependencies": ["T-0701", "T-0004"],
+      "acceptance": "release-manifest.json 含精确版本与包哈希；compliance-matrix 覆盖隐私/适龄/资质状态；store-listing 完成；上传/提审/发布仅按用户逐项授权执行",
+      "status": "todo"
+    },
+    {
+      "id": "T-0901",
+      "title": "上线观察与迭代准备",
+      "stage": "09-operations",
+      "owner": "operations",
+      "dependencies": ["T-0801"],
+      "acceptance": "metrics-plan.json 仅使用平台合规数据口径（不新增个人信息收集）；incident-runbook 含回滚与应急步骤",
+      "status": "todo"
+    }
+  ]
+}

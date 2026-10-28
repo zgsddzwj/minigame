@@ -1,0 +1,25 @@
+
+== [data-sync] sha256(data/numeric.json) == sha256(game/assets/resources/config/numeric.json)
+   一致 382fe03f00c04f19…
+
+== [typecheck] C:\nvm4w\nodejs\node.exe node_modules/typescript/bin/tsc -p tsconfig.check.json --noEmit
+   exit=0 (193ms)
+
+== [unit-tests] C:\nvm4w\nodejs\node.exe node_modules/vitest/vitest.mjs run tests/unit --reporter=dot
+   exit=0 (1544ms)
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/zgsdd/Desktop/projects/minigame/game-workspace/game[39m
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m
+
+[2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+[2m      Tests [22m [1m[32m56 passed[39m[22m[90m (56)[39m
+[2m   Start at [22m 10:45:43
+[2m   Duration [22m 800ms[2m (transform 496ms, setup 0ms, collect 954ms, tests 53ms, environment 1ms, prepare 1.87s)[22m
+
+== [core-purity] 扫描 10 个文件
+   无违规（wx/cc/DOM/Math.random 均未出现）
+
+[verify:prototype] prototype 入口通过（data 同步 / 类型检查 / 单元测试 / core 纯净性）
+报告：deliverables/logs/verify-prototype.json
+

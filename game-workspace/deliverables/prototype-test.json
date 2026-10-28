@@ -1,0 +1,217 @@
+{
+  "stage": "03-prototype",
+  "game": "节气跳跳（jieqi-tiaotiao）",
+  "revision": "v2 H2 返工调校（maxDurationSec 2.0 / 首档加宽收窄 gap / 新手前 2 跳保护 / 蓄力反馈强化 / 结算距离校准）",
+  "generatedAt": "2026-10-28T11:05:30+08:00",
+  "status": "pass",
+  "statusBasis": "以下 commands 全部于 2026-10-28 在本机实际执行且退出码符合预期（Cocos CLI 36 为官方成功码）；scenarios 来自真实运行输出；未运行的项目一律不写入 pass（微信端、真机、性能均未运行，明确列为 notRun）。v2 返工完成后于编排器第 3 次运行（代码零改动）复跑 verify prototype 与 development，均 exit 0 且结果一致（见 rerun 条目；规范日志路径为滚动覆盖，现内容即复跑记录）",
+  "engine": {
+    "cocosCreator": "3.8.8",
+    "executable": "C:/ProgramData/cocos/editors/Creator/3.8.8/CocosCreator.exe",
+    "node": "20.20.0",
+    "devDependencies": { "typescript": "7.0.2", "vitest": "3.2.4", "playwright": "1.64.1" }
+  },
+  "commands": [
+    {
+      "id": "verify-prototype",
+      "command": "node scripts/verify.mjs prototype",
+      "cwd": "game",
+      "exit": 0,
+      "executedAt": "2026-10-28T09:58:47+08:00",
+      "purpose": "data 哈希同步 / tsc 类型检查 / vitest 单测（7 文件 56 用例 176 断言）/ core 纯净性扫描",
+      "report": "deliverables/logs/verify-prototype.json"
+    },
+    {
+      "id": "cocos-build-web",
+      "command": "CocosCreator.exe --project <game> --build configPath=scripts/build-config.web.json",
+      "cwd": "game",
+      "exit": 36,
+      "executedAt": "2026-10-28T09:59:20+08:00",
+      "purpose": "Cocos Creator 3.8.8 CLI 真实构建 web-mobile（含本版全部返工改动；36 为官方成功码，构建任务 13s）",
+      "report": "deliverables/logs/cocos-build-web.log"
+    },
+    {
+      "id": "verify-development",
+      "command": "node scripts/verify.mjs development",
+      "cwd": "game",
+      "exit": 0,
+      "executedAt": "2026-10-28T10:00:11+08:00",
+      "purpose": "prototype 全部步骤 + web 构建版本一致性（3.8.8）+ Playwright 冒烟",
+      "report": "deliverables/logs/verify-development.json"
+    },
+    {
+      "id": "web-smoke",
+      "command": "node tests/web/smoke.mjs",
+      "cwd": "game",
+      "exit": 0,
+      "executedAt": "2026-10-28T10:00:29+08:00",
+      "purpose": "Playwright 驱动最终 web 构建的 27 项玩法冒烟（390x844；蓄力参数从运行时配置读取）",
+      "report": "deliverables/logs/web-smoke.json"
+    },
+    {
+      "id": "capture-screens",
+      "command": "node scripts/capture-screens.mjs",
+      "cwd": "game",
+      "exit": 0,
+      "executedAt": "2026-10-28T10:00:00+08:00",
+      "purpose": "对修复后最终构建截图 5 张作为人工审查视觉证据",
+      "report": "deliverables/screenshots/"
+    },
+    {
+      "id": "verify-prototype-rerun",
+      "command": "node scripts/verify.mjs prototype",
+      "cwd": "game",
+      "exit": 0,
+      "executedAt": "2026-10-28T10:58:03+08:00",
+      "purpose": "合规交卷轮复跑（代码零改动）：data 哈希一致 382fe03f… / tsc 通过 / 7 文件 56 用例 176 断言全过 / core 10 文件纯净性无违规；另从工作区根以门禁命令 node game/scripts/verify.mjs prototype 复跑同样 exit 0",
+      "report": "deliverables/logs/verify-prototype.json"
+    },
+    {
+      "id": "verify-development-rerun",
+      "command": "node scripts/verify.mjs development",
+      "cwd": "game",
+      "exit": 0,
+      "executedAt": "2026-10-28T11:03:52+08:00",
+      "purpose": "合规交卷轮复跑（代码零改动）：prototype 全部步骤 + 09:59 构建产物存在且版本一致（3.8.8）+ Playwright 冒烟 27/27（含 novice-instinct-hold-survives 与跨局分数回归）",
+      "report": "deliverables/logs/verify-development.json"
+    }
+  ],
+  "scenarios": [
+    {
+      "group": "unit-core",
+      "name": "蓄力映射与非法输入",
+      "detail": "t=0 返回最小距离 120px；线性中点映射；2.0s 蓄满封顶 640px（速率 260px/s）；负数/NaN 按未蓄力处理不产生 NaN",
+      "result": "pass",
+      "assertions": 16
+    },
+    {
+      "group": "unit-core",
+      "name": "落点判定与边界",
+      "detail": "game-design §4 走查例：偏移 10→Perfect、55→站稳、74→站稳+踉跄、80→坠落；阈值 ±0.01px 边界；负向对称；perfectThresholdForJump：第 1–2 跳 24px、第 3 跳起 18px",
+      "result": "pass",
+      "assertions": 29
+    },
+    {
+      "group": "unit-core",
+      "name": "计分与连击",
+      "detail": "Perfect +2（奖励从第 3 次连击起 +min(连击前-1,4) 且封顶）；站稳 +1 清零；每 5 连击触发里程碑事件",
+      "result": "pass",
+      "assertions": 13
+    },
+    {
+      "group": "unit-core",
+      "name": "种子化台座生成",
+      "detail": "首台座宽 200 居中；同种子序列完全一致、异种子不同；宽度/gap 落在数值表区间；前 novice.jumpCount=2 跳固定 gap 120 不消耗随机；配置与 data/numeric.json 无漂移",
+      "result": "pass",
+      "assertions": 23
+    },
+    {
+      "group": "unit-core",
+      "name": "H2 返工调校回归（tuning.test.ts）",
+      "detail": "本能节奏按住 0.5–1.05s × 前 2 跳 × 30 种子无一坠落（修复前必死）；首档最窄台生还窗口 (190−8)/260=0.70s ≥0.6s；v2 速率 260 < 旧速率 577.8/1.9；新手保护期外（第 3 跳起）窗口仍 >0.3s",
+      "result": "pass",
+      "assertions": 5
+    },
+    {
+      "group": "unit-core",
+      "name": "状态机与玩法闭环",
+      "detail": "home/playing/paused/gameover 全迁移；教程 3 步推进与跳过记档；过短按压（连点）坠落入档；同 seed 同输入结果序列一致；暂停中按压无效、蓄力取消；切后台自动暂停；多点触控防御；40 跳中心距全部在蓄力可达范围内；跨局分数泄漏回归（上局 7 分→坠落→重开→Perfect 后必须 2 而非 9）；坠落记录本跳/目标距离且重开清空",
+      "result": "pass",
+      "assertions": 76
+    },
+    {
+      "group": "unit-core",
+      "name": "存档损坏与恢复",
+      "detail": "截断 JSON 降级默认档不抛异常；字段类型错误/版本不识别一律降级；KVStore 注入读写；存储写入异常静默不影响读取",
+      "result": "pass",
+      "assertions": 14
+    },
+    {
+      "group": "web-smoke",
+      "name": "启动与首页",
+      "detail": "引擎启动（version 0.2.0-prototype）、首页状态、开始按钮可见、点击进入 playing（boot-engine/home-state/home-start-button-visible/start-game/playing-after-start）",
+      "result": "pass",
+      "assertions": 5
+    },
+    {
+      "group": "web-smoke",
+      "name": "教程局与首跳",
+      "detail": "教程第 1 步展示；首跳落 Perfect（偏移 1.65px）；分数上涨；教程自动完成并记档；运行时蓄力上限 durMs=2000（charge-duration-v2，防回退硬编码）",
+      "result": "pass",
+      "assertions": 5
+    },
+    {
+      "group": "web-smoke",
+      "name": "连击与台座推进",
+      "detail": "连续 3 次蓄力跳全部落稳（combo=4、score=11）；台座推进到 idx=4",
+      "result": "pass",
+      "assertions": 2
+    },
+    {
+      "group": "web-smoke",
+      "name": "失败与结算",
+      "detail": "过短按压坠落进入 gameover；总局数 +1；最高分记录 11；重开按钮可见",
+      "result": "pass",
+      "assertions": 4
+    },
+    {
+      "group": "web-smoke",
+      "name": "重开/新手本能回归",
+      "detail": "重开后归零（best/games 保留）；重开后按住 1s（旧版 0.9s 封顶下的必死本能节奏）生还且分数为 1（novice-instinct-hold-survives；同时是跨局分数泄漏修复的实证）",
+      "result": "pass",
+      "assertions": 3
+    },
+    {
+      "group": "web-smoke",
+      "name": "暂停/设置/回首页",
+      "detail": "暂停→恢复→再暂停；音效开关切换并持久化（存档 JSON 读回一致）；回首页",
+      "result": "pass",
+      "assertions": 7
+    },
+    {
+      "group": "web-smoke",
+      "name": "页面健康",
+      "detail": "全程无页面错误（console/pageerror 捕获为空）",
+      "result": "pass",
+      "assertions": 1
+    }
+  ],
+  "notRun": [
+    { "item": "微信构建（wechatgame）与微信真机验证", "reason": "属 06 阶段；本阶段只交付 Web 原型", "unlock": "node scripts/verify.mjs wechat（需 H3 后按编排器调度）" },
+    { "item": "人工 3 局试玩（H2 复审门禁本身）", "reason": "只能由人执行；本报告的试玩记录为 Playwright 自动化模拟", "unlock": "按 deliverables/03-prototype.md §4 打开并试玩" },
+    { "item": "FPS/首屏/主包体积性能实测", "reason": "属 06/08 阶段实测项", "unlock": "release 入口启用后实测" },
+    { "item": "截图内容目视核对", "reason": "本 Agent 运行环境无法直接查看 PNG 图片内容；截图由脚本从真实构建自动捕获", "unlock": "H2 人工审查 deliverables/screenshots/01~05.png" }
+  ],
+  "evidence": [
+    "deliverables/03-prototype.md",
+    "deliverables/logs/verify-prototype.json",
+    "deliverables/logs/verify-development.json",
+    "deliverables/logs/web-smoke.json",
+    "deliverables/logs/cocos-build-web.log",
+    "deliverables/screenshots/01-home.png",
+    "deliverables/screenshots/02-tutorial.png",
+    "deliverables/screenshots/03-charging.png",
+    "deliverables/screenshots/04-playing.png",
+    "deliverables/screenshots/05-gameover.png",
+    "data/numeric.json",
+    "game/package.json",
+    "game/scripts/verify.mjs",
+    "game/scripts/sync-data.mjs",
+    "game/tests/unit/charge.test.ts",
+    "game/tests/unit/landing.test.ts",
+    "game/tests/unit/score.test.ts",
+    "game/tests/unit/stage-gen.test.ts",
+    "game/tests/unit/session.test.ts",
+    "game/tests/unit/tuning.test.ts",
+    "game/tests/unit/save.test.ts",
+    "game/tests/web/smoke.mjs",
+    "game/tests/web/debug-instinct.mjs",
+    "game/build/web-mobile/index.html"
+  ],
+  "artifacts": [
+    "deliverables/03-prototype.md",
+    "deliverables/prototype-test.json",
+    "game/package.json",
+    "game/scripts/verify.mjs"
+  ]
+}

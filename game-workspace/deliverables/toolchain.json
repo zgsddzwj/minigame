@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "generatedAt": "2026-10-27T19:12:21+08:00",
+  "workspace": "game-workspace",
+  "evidence": "deliverables/evidence-02-architecture.txt",
+  "engine": {
+    "name": "Cocos Creator",
+    "series": "3.8 LTS",
+    "patchVersion": null,
+    "executable": null,
+    "status": "editor_not_installed",
+    "dashboard": {
+      "installed": true,
+      "version": "2.2.1",
+      "versionSource": "C:\\Program Files (x86)\\CocosDashboard\\CocosDashboard.exe FileVersion（实测）",
+      "path": "C:\\Program Files (x86)\\CocosDashboard",
+      "installedAt": "2026-10-27",
+      "launched": false,
+      "editorsDownloaded": false
+    },
+    "installAction": "用户在 Cocos Dashboard 内安装 Creator 3.8 LTS 系列最新补丁（下载约 1-2GB）；安装后以 CocosCreator.exe --version 实测回填本文件 patchVersion/executable",
+    "lockProcedure": "实测版本 → 03-prototype 真实工程构建复核 → 首版期间冻结；升级视为变更需重新验证"
+  },
+  "nodeVersion": "20.20.0",
+  "packageManager": {
+    "name": "npm",
+    "version": "10.8.2",
+    "registry": "https://registry.npmjs.org/",
+    "registryReachable": true,
+    "registryProbe": "200 OK，7.19s（2026-10-27 实测）",
+    "mirrorFallback": "https://registry.npmmirror.com/（200 OK，3.33s）",
+    "lockfile": "game/package-lock.json（03 阶段生成后入库）"
+  },
+  "gitVersion": "2.53.0.windows.1",
+  "dependencies": {
+    "status": "to_lock_at_03-prototype",
+    "runtime": [],
+    "plannedDev": [
+      { "name": "typescript", "version": null, "note": "安装时 --save-exact 按 registry 实际解析锁定" },
+      { "name": "vitest", "version": null, "note": "规则单测运行器；版本同上锁定" },
+      { "name": "playwright", "version": null, "note": "Web 冒烟；浏览器二进制下载失败时用 PLAYWRIGHT_DOWNLOAD_HOST 走 npmmirror 镜像，仍失败则显式返工" }
+    ],
+    "runtimeDependencyPolicy": "运行时第三方依赖为 0：渲染/音频/存储全部使用引擎与平台能力"
+  },
+  "wechatDevtools": {
+    "cliPath": "C:/Program Files (x86)/Tencent/微信web开发者工具/cli.bat",
+    "cliExists": true,
+    "cliRunnable": true,
+    "cliProbe": "cli.bat -h exit=0，输出子命令清单（open/login/islogin/preview/upload/build-npm/quit 等），2026-10-27 实测",
+    "ideVersion": null,
+    "servicePortEnabled": null,
+    "loggedIn": null,
+    "notes": "IDE 版本获取方式=设置-关于面板或启动日志；servicePort/登录由用户本人操作，06 阶段前完成并记录"
+  },
+  "buildTarget": {
+    "platform": "wechatgame",
+    "cliSuccessExitCode": 36,
+    "buildConfigFile": "game/scripts/build-config.json",
+    "baseLibrary": null,
+    "baseLibraryLockProcedure": "06 阶段在真实开发者工具『详情-基础库』选择最近稳定版并写死 project.config.json 的 libVersion",
+    "mainPackageBudget": "≤4MB（工程目标，release 入口硬检查，实测为准）",
+    "desktopSessionRequired": true
+  },
+  "verification": {
+    "executedAt": "2026-10-27T18:58-19:12+08:00",
+    "environment": "Windows 10.0.26200 x64，仅 C: 盘",
+    "probes": [
+      { "id": "P1", "check": "node --version", "result": "v20.20.0", "exit": 0 },
+      { "id": "P2", "check": "npm --version", "result": "10.8.2", "exit": 0 },
+      { "id": "P4", "check": "registry/npmjs+npmmirror+weixin docs HTTP 探测", "result": "200/200/200", "exit": 0 },
+      { "id": "P5", "check": "git --version", "result": "2.53.0.windows.1", "exit": 0 },
+      { "id": "P6", "check": "CocosCreator.exe 全路径/注册表/默认目录检索", "result": "未发现（编辑器未安装）", "exit": 0 },
+      { "id": "P7", "check": "Cocos Dashboard 安装与启动状态", "result": "已安装 2.2.1，无启动记录，编辑器未下载", "exit": 0 },
+      { "id": "P8", "check": "微信开发者工具 cli.bat -h", "result": "exit=0，子命令清单正常", "exit": 0 }
+    ],
+    "productChecks": [
+      { "id": "C1", "check": "backlog.json/toolchain.json 解析与必需字段校验", "result": "见 evidence 追加段" },
+      { "id": "C2", "check": "产物与证据存在性校验", "result": "见 evidence 追加段" },
+      { "id": "C3", "check": "交付物 SHA256", "result": "见 evidence 追加行" }
+    ]
+  },
+  "unknowns": [
+    { "key": "engine.patchVersion", "reason": "编辑器未安装", "unlock": "T-0001 安装后实测回填" },
+    { "key": "wechatDevtools.ideVersion", "reason": "配置目录无版本文件", "unlock": "06 阶段读 IDE 关于面板/启动日志" },
+    { "key": "buildTarget.baseLibrary", "reason": "基础库可用列表需真实工具", "unlock": "06 阶段实选并写死" },
+    { "key": "audioFormat.wechat", "reason": "需真实构建验证", "unlock": "03/06 构建实测（初版 wav）" },
+    { "key": "playwright.browserDownload", "reason": "浏览器 CDN 网络依赖", "unlock": "03 安装实测，npmmirror 镜像回退" },
+    { "key": "icp.duration", "reason": "外部官方流程", "unlock": "用户启动备案后记录" },
+    { "key": "devices.list", "reason": "用户设备未登记", "unlock": "T-0003" },
+    { "key": "cloudbase.pricing", "reason": "官方实时价格未核实", "unlock": "如触发后端重评时查官网（首版不适用）" }
+  ]
+}

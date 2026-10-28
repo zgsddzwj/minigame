@@ -1,0 +1,247 @@
+{
+  "entry": "web-smoke",
+  "buildDir": "game/build/web-mobile",
+  "url": "http://127.0.0.1:60677/",
+  "viewport": "390x844",
+  "finishedAt": "2026-10-28T03:04:09.636Z",
+  "passed": 27,
+  "failed": 0,
+  "results": [
+    {
+      "name": "boot-engine",
+      "pass": true,
+      "detail": {
+        "env": "web",
+        "version": "0.2.0-prototype"
+      }
+    },
+    {
+      "name": "home-state",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "home-start-button-visible",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "start-game",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "playing-after-start",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "tutorial-step1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "jump1-lands",
+      "pass": true,
+      "detail": {
+        "verdict": "perfect",
+        "offset": 4.7,
+        "points": 2
+      }
+    },
+    {
+      "name": "jump1-score-increases",
+      "pass": true,
+      "detail": {
+        "state": "playing",
+        "score": 2,
+        "combo": 1,
+        "games": 0,
+        "best": 0,
+        "tutorialDone": true,
+        "sound": true,
+        "platforms": 3,
+        "idx": 1
+      }
+    },
+    {
+      "name": "tutorial-auto-done",
+      "pass": true,
+      "detail": {
+        "state": "playing",
+        "score": 2,
+        "combo": 1,
+        "games": 0,
+        "best": 0,
+        "tutorialDone": true,
+        "sound": true,
+        "platforms": 3,
+        "idx": 1
+      }
+    },
+    {
+      "name": "charge-duration-v2",
+      "pass": true,
+      "detail": {
+        "min": 120,
+        "max": 640,
+        "durMs": 2000
+      }
+    },
+    {
+      "name": "combo-jumps-land",
+      "pass": true,
+      "detail": {
+        "state": "playing",
+        "score": 11,
+        "combo": 4,
+        "games": 0,
+        "best": 0,
+        "tutorialDone": true,
+        "sound": true,
+        "platforms": 6,
+        "idx": 4
+      }
+    },
+    {
+      "name": "platforms-advance",
+      "pass": true,
+      "detail": {
+        "state": "playing",
+        "score": 11,
+        "combo": 4,
+        "games": 0,
+        "best": 0,
+        "tutorialDone": true,
+        "sound": true,
+        "platforms": 6,
+        "idx": 4
+      }
+    },
+    {
+      "name": "fall-gameover",
+      "pass": true,
+      "detail": {
+        "state": "gameover",
+        "score": 11,
+        "combo": 4,
+        "games": 1,
+        "best": 11,
+        "tutorialDone": true,
+        "sound": true,
+        "platforms": 6,
+        "idx": 4
+      }
+    },
+    {
+      "name": "games-counted",
+      "pass": true,
+      "detail": {
+        "state": "gameover",
+        "score": 11,
+        "combo": 4,
+        "games": 1,
+        "best": 11,
+        "tutorialDone": true,
+        "sound": true,
+        "platforms": 6,
+        "idx": 4
+      }
+    },
+    {
+      "name": "best-recorded",
+      "pass": true,
+      "detail": {
+        "state": "gameover",
+        "score": 11,
+        "combo": 4,
+        "games": 1,
+        "best": 11,
+        "tutorialDone": true,
+        "sound": true,
+        "platforms": 6,
+        "idx": 4
+      }
+    },
+    {
+      "name": "restart-button-visible",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "restart",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "restart-playing",
+      "pass": true,
+      "detail": {
+        "state": "playing",
+        "score": 0,
+        "combo": 0,
+        "games": 1,
+        "best": 11,
+        "tutorialDone": true,
+        "sound": true,
+        "platforms": 2,
+        "idx": 0
+      }
+    },
+    {
+      "name": "novice-instinct-hold-survives",
+      "pass": true,
+      "detail": {
+        "state": "playing",
+        "score": 1,
+        "combo": 0,
+        "games": 1,
+        "best": 11,
+        "tutorialDone": true,
+        "sound": true,
+        "platforms": 3,
+        "idx": 1
+      }
+    },
+    {
+      "name": "pause",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "resume",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pause-again",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "toggle-sound",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "sound-off",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "save-persisted",
+      "pass": true,
+      "detail": "{\"v\":1,\"best\":11,\"games\":1,\"sound\":false,\"haptics\":true,\"tutorialDone\":true}"
+    },
+    {
+      "name": "to-home",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "no-page-errors",
+      "pass": true,
+      "detail": []
+    }
+  ]
+}

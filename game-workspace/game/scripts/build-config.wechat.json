@@ -1,0 +1,8 @@
+{
+  "title": "jieqi-tiaotiao",
+  "buildPath": "build/wechatgame",
+  "platform": "wechatgame",
+  "debug": false,
+  "md5Cache": true,
+  "sourceMaps": false
+}

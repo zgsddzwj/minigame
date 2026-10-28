@@ -1,0 +1,56 @@
+{
+  "entry": "development",
+  "startedAt": "2026-10-28T03:03:51.337Z",
+  "steps": [
+    {
+      "name": "data-sync",
+      "command": "sha256(data/numeric.json) == sha256(game/assets/resources/config/numeric.json)",
+      "exit": 0,
+      "detail": {
+        "src": "382fe03f00c04f19cc96c3586ee651b39fa19a9027700e8b6d79155c4c348806",
+        "dst": "382fe03f00c04f19cc96c3586ee651b39fa19a9027700e8b6d79155c4c348806"
+      }
+    },
+    {
+      "name": "typecheck",
+      "command": "C:\\nvm4w\\nodejs\\node.exe node_modules/typescript/bin/tsc -p tsconfig.check.json --noEmit",
+      "exit": 0,
+      "durationMs": 263,
+      "stdoutTail": "",
+      "stderrTail": ""
+    },
+    {
+      "name": "unit-tests",
+      "command": "C:\\nvm4w\\nodejs\\node.exe node_modules/vitest/vitest.mjs run tests/unit --reporter=dot",
+      "exit": 0,
+      "durationMs": 1922,
+      "stdoutTail": "\n\u001b[1m\u001b[46m RUN \u001b[49m\u001b[22m \u001b[36mv3.2.4 \u001b[39m\u001b[90mC:/Users/zgsdd/Desktop/projects/minigame/game-workspace/game\u001b[39m\n\n\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m7 passed\u001b[39m\u001b[22m\u001b[90m (7)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m56 passed\u001b[39m\u001b[22m\u001b[90m (56)\u001b[39m\n\u001b[2m   Start at \u001b[22m 11:03:52\n\u001b[2m   Duration \u001b[22m 940ms\u001b[2m (transform 535ms, setup 0ms, collect 1.13s, tests 63ms, environment 2ms, prepare 2.03s)\u001b[22m\n\n",
+      "stderrTail": ""
+    },
+    {
+      "name": "core-purity",
+      "command": "grep 纯净性扫描 assets/scripts/core（10 个文件）",
+      "exit": 0,
+      "hits": []
+    },
+    {
+      "name": "web-build-present",
+      "command": "检查 game/build/index.html 与 settings.json CocosEngine",
+      "exit": 0,
+      "detail": {
+        "built": "3.8.8",
+        "project": "3.8.8"
+      }
+    },
+    {
+      "name": "web-smoke",
+      "command": "C:\\nvm4w\\nodejs\\node.exe tests/web/smoke.mjs",
+      "exit": 0,
+      "durationMs": 16115,
+      "stdoutTail": "PASS  boot-engine  {\"env\":\"web\",\"version\":\"0.2.0-prototype\"}\nPASS  home-state\nPASS  home-start-button-visible\nPASS  start-game\nPASS  playing-after-start\nPASS  tutorial-step1\nPASS  jump1-lands  {\"verdict\":\"perfect\",\"offset\":4.7,\"points\":2}\nPASS  jump1-score-increases  {\"state\":\"playing\",\"score\":2,\"combo\":1,\"games\":0,\"best\":0,\"tutorialDone\":true,\"sound\":true,\"platforms\":3,\"idx\":1}\nPASS  tutorial-auto-done  {\"state\":\"playing\",\"score\":2,\"combo\":1,\"games\":0,\"best\":0,\"tutorialDone\":true,\"sound\":true,\"platforms\":3,\"idx\":1}\nPASS  charge-duration-v2  {\"min\":120,\"max\":640,\"durMs\":2000}\nPASS  combo-jumps-land  {\"state\":\"playing\",\"score\":11,\"combo\":4,\"games\":0,\"best\":0,\"tutorialDone\":true,\"sound\":true,\"platforms\":6,\"idx\":4}\nPASS  platforms-advance  {\"state\":\"playing\",\"score\":11,\"combo\":4,\"games\":0,\"best\":0,\"tutorialDone\":true,\"sound\":true,\"platforms\":6,\"idx\":4}\nPASS  fall-gameover  {\"state\":\"gameover\",\"score\":11,\"combo\":4,\"games\":1,\"best\":11,\"tutorialDone\":true,\"sound\":true,\"platforms\":6,\"idx\":4}\nPASS  games-counted  {\"state\":\"gameover\",\"score\":11,\"combo\":4,\"games\":1,\"best\":11,\"tutorialDone\":true,\"sound\":true,\"platforms\":6,\"idx\":4}\nPASS  best-recorded  {\"state\":\"gameover\",\"score\":11,\"combo\":4,\"games\":1,\"best\":11,\"tutorialDone\":true,\"sound\":true,\"platforms\":6,\"idx\":4}\nPASS  restart-button-visible\nPASS  restart\nPASS  restart-playing  {\"state\":\"playing\",\"score\":0,\"combo\":0,\"games\":1,\"best\":11,\"tutorialDone\":true,\"sound\":true,\"platforms\":2,\"idx\":0}\nPASS  novice-instinct-hold-survives  {\"state\":\"playing\",\"score\":1,\"combo\":0,\"games\":1,\"best\":11,\"tutorialDone\":true,\"sound\":true,\"platforms\":3,\"idx\":1}\nPASS  pause\nPASS  resume\nPASS  pause-again\nPASS  toggle-sound\nPASS  sound-off\nPASS  save-persisted  \"{\\\"v\\\":1,\\\"best\\\":11,\\\"games\\\":1,\\\"sound\\\":false,\\\"haptics\\\":true,\\\"tutorialDone\\\":true}\"\nPASS  to-home\nPASS  no-page-errors  []\n\nsmoke: 27 passed / 0 failed → deliverables/logs/web-smoke.json\n",
+      "stderrTail": ""
+    }
+  ],
+  "ok": true,
+  "finishedAt": "2026-10-28T03:04:09.650Z"
+}

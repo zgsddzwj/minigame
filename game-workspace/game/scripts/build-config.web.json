@@ -1,0 +1,8 @@
+{
+  "title": "jieqi-tiaotiao",
+  "buildPath": "build",
+  "platform": "web-mobile",
+  "debug": true,
+  "md5Cache": false,
+  "sourceMaps": true
+}
